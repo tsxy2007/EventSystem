@@ -43,4 +43,15 @@ class UEventSystemBPLibrary : public UBlueprintFunctionLibrary
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Broadcast Event", ScriptName = "UnBindEvent", DefaultToSelf = "Object"), Category = "Utilities|EventSystem")
 	static void Broadcast(const UObject* WorldContextObject, FString MsgType, const FEventBase& Event);
+
+
+
+	UFUNCTION(BlueprintCallable, CustomThunk, meta = (DisplayName = "Post Message", CompactNodeTitle = "POSTMSG"), Category = "Utilities|EventSystem")
+	static int32 PostMessage(const FString& MsgType, const int32& NewItem);
+
+	DECLARE_FUNCTION(execPostMessage)
+	{
+	
+	}
+
 };
