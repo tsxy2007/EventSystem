@@ -1,16 +1,15 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "EventSystem.h"
+#include "EventSystemEditor.h"
 
-#define LOCTEXT_NAMESPACE "FEventSystemModule"
+#define LOCTEXT_NAMESPACE "EventSystemEditorModule"
 
-void FEventSystemModule::StartupModule()
+void FEventSystemEditorModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
-	
 }
 
-void FEventSystemModule::ShutdownModule()
+void FEventSystemEditorModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
@@ -19,4 +18,4 @@ void FEventSystemModule::ShutdownModule()
 
 #undef LOCTEXT_NAMESPACE
 	
-IMPLEMENT_MODULE(FEventSystemModule, EventSystem)
+IMPLEMENT_MODULE(FEventSystemEditorModule, EventSystemEditor)

@@ -7,14 +7,14 @@
 #include "GIEventSubsystem.generated.h"
 
 USTRUCT(BlueprintType, Blueprintable)
-struct EVENTSYSTEM_API FEventBase
+struct EVENTSYSTEMRUNTIME_API FEventBase
 {
 	GENERATED_BODY()
 	FEventBase(){}
 };
 
 USTRUCT(BlueprintType, Blueprintable)
-struct EVENTSYSTEM_API FEventTest : public FEventBase
+struct EVENTSYSTEMRUNTIME_API FEventTest : public FEventBase
 {
 	GENERATED_BODY()
 	FEventTest() {}
@@ -56,7 +56,7 @@ public:
  * 
  */
 UCLASS()
-class EVENTSYSTEM_API UGIEventSubsystem : public UGameInstanceSubsystem
+class EVENTSYSTEMRUNTIME_API UGIEventSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 

@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class EventSystem : ModuleRules
+public class EventSystemEditor : ModuleRules
 {
-	public EventSystem(ReadOnlyTargetRules Target) : base(Target)
+	public EventSystemEditor(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
@@ -12,13 +12,14 @@ public class EventSystem : ModuleRules
 			new string[] {
 				// ... add public include paths required here ...
 			}
-			);
+            );
 				
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {
 				// ... add other private include paths required here ...
-			}
+				"EventSystemEditor/Public",
+            }
 			);
 			
 		
@@ -38,6 +39,7 @@ public class EventSystem : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"BlueprintGraph",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

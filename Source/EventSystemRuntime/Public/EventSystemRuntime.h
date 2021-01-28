@@ -4,7 +4,7 @@
 
 #include "Modules/ModuleManager.h"
 
-class FEventSystemModule : public IModuleInterface
+class FEventSystemRuntimeModule : public IModuleInterface
 {
 public:
 
