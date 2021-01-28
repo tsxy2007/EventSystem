@@ -11,7 +11,7 @@
  * 
  */
 UCLASS(MinimalAPI, abstract)
-class EVENTSYSTEMEDITOR_API UK2Node_BaseESDelegate : public UK2Node
+class UK2Node_BaseESDelegate : public UK2Node
 {
 	GENERATED_UCLASS_BODY()
 
