@@ -28,30 +28,4 @@ class UEventSystemBPLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_UCLASS_BODY()
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Bind Event by Event", ScriptName = "SetEvent", DefaultToSelf = "Object", AdvancedDisplay = "InitialStartDelay, InitialStartDelayVariance"), Category = "Utilities|EventSystem")
-	static FEventHandle BindEventToSystemDelegate( FString MsgType, FEventSystemDelegate Delegate);
-
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Bind Event by Function Name", ScriptName = "SetEvent", DefaultToSelf = "Object", AdvancedDisplay = "InitialStartDelay, InitialStartDelayVariance"), Category = "Utilities|EventSystem")
-	static FEventHandle BindEventToSystem(FString MsgType, UObject* Object, FString FunctionName);
-
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "UnBind Event By Handle", ScriptName = "UnBindEvent", DefaultToSelf = "Object"), Category = "Utilities|EventSystem")
-	static void UnBindEventByHandle(const UObject* WorldContextObject, const FEventHandle& Handle);
-
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "UnBind MsgType Event By Object", ScriptName = "UnBindEvent", DefaultToSelf = "Object"), Category = "Utilities|EventSystem")
-		static void UnBindEventByObject(const UObject* WorldContextObject, FString MsgType,UObject* Object);
-
-
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Broadcast Event", ScriptName = "UnBindEvent", DefaultToSelf = "Object"), Category = "Utilities|EventSystem")
-	static void Broadcast(const UObject* WorldContextObject, FString MsgType, const FEventBase& Event);
-
-
-
-	UFUNCTION(BlueprintCallable, CustomThunk, meta = (DisplayName = "Post Message", CompactNodeTitle = "POSTMSG"), Category = "Utilities|EventSystem")
-	static int32 PostMessage(const FString& MsgType, const int32& NewItem);
-
-	DECLARE_FUNCTION(execPostMessage)
-	{
-	
-	}
-
 };
