@@ -8,17 +8,18 @@ namespace UnrealBuildTool.Rules
 		{
 			PrivateIncludePaths.AddRange(
 				new string[] {
-					"Runtime/EventsRuntime/Private",
+					"EventsRuntime/Private",
 				}
 				);
 
 			PublicDependencyModuleNames.AddRange(
 				new string[]
 				{
-					"Core",
-					"CoreUObject",
-					"Engine"
-				}
+                    "Core",
+                    "CoreUObject",
+                    "Engine",
+                    "EventSystemRuntime"
+                }
 				);
 
             if (Target.Type == TargetType.Editor)

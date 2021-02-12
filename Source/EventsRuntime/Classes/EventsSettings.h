@@ -163,15 +163,15 @@ class EVENTSRUNTIME_API UEventsSettings : public UEventsList
 	int32 NetIndexFirstBitSegment;
 
 	/** A list of .ini files used to store restricted gameplay tags. */
-	UPROPERTY(config, EditAnywhere, AdvancedDisplay, Category = "Advanced Gameplay Tags")
+	UPROPERTY(config, EditAnywhere, AdvancedDisplay, Category = "Advanced Events")
 	TArray<FEventRestrictedConfigInfo> RestrictedConfigFiles;
 #if WITH_EDITORONLY_DATA
 	// Dummy parameter used to hook the editor UI
-	/** Restricted Gameplay Tags.
+	/** Restricted Events.
 	 * 
 	 *  Restricted tags are intended to be top level tags that are important for your data hierarchy and modified by very few people.
 	 */
-	UPROPERTY(EditAnywhere, AdvancedDisplay, transient, Category = "Advanced Gameplay Tags")
+	UPROPERTY(EditAnywhere, AdvancedDisplay, transient, Category = "Advanced Events")
 	FString RestrictedTagList;
 #endif
 

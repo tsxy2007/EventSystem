@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleInterface.h"
 #include "Modules/ModuleManager.h"
-#include "EventContainer.h"
 #include "EngineGlobals.h"
 #include "EventsManager.h"
 

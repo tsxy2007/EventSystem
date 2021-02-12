@@ -1078,7 +1078,7 @@ void UEventsManager::PrintReplicationIndices()
 void UEventsManager::PrintReplicationFrequencyReport()
 {
 	UE_LOG(LogEvents, Warning, TEXT("================================="));
-	UE_LOG(LogEvents, Warning, TEXT("Gameplay Tags Replication Report"));
+	UE_LOG(LogEvents, Warning, TEXT("Events Replication Report"));
 
 	UE_LOG(LogEvents, Warning, TEXT("\nTags replicated solo:"));
 	ReplicationCountMap_SingleTags.ValueSort(TGreater<int32>());

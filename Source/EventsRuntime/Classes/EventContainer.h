@@ -15,13 +15,11 @@ struct FPropertyTag;
 
 EVENTSRUNTIME_API DECLARE_LOG_CATEGORY_EXTERN(LogEvents, Log, All);
 
-DECLARE_STATS_GROUP_VERBOSE(TEXT("Gameplay Tags"), STATGROUP_Events, STATCAT_Advanced);
+DECLARE_STATS_GROUP_VERBOSE(TEXT("EventTag"), STATGROUP_Events, STATCAT_Advanced);
 
 DECLARE_CYCLE_STAT_EXTERN(TEXT("FEventContainer::HasTag"), STAT_FEventContainer_HasTag, STATGROUP_Events, EVENTSRUNTIME_API);
 DECLARE_CYCLE_STAT_EXTERN(TEXT("FEventContainer::DoesTagContainerMatch"), STAT_FEventContainer_DoesTagContainerMatch, STATGROUP_Events, EVENTSRUNTIME_API);
 DECLARE_CYCLE_STAT_EXTERN(TEXT("UEventsManager::EventsMatch"), STAT_UEventsManager_EventsMatch, STATGROUP_Events, EVENTSRUNTIME_API);
-
-struct FEventContainer;
 
 // DEPRECATED ENUMS
 UENUM(BlueprintType)
@@ -48,7 +46,7 @@ typedef uint16 FEventNetIndex;
  * A single gameplay tag, which represents a hierarchical name of the form x.y that is registered in the EventsManager
  * You can filter the gameplay tags displayed in the editor using, meta = (Categories = "Tag1.Tag2.Tag3"))
  */
-USTRUCT(BlueprintType, meta = (HasNativeMake = "Events.BlueprintEventLibrary.MakeLiteralEvent", HasNativeBreak = "Events.BlueprintEventLibrary.GetTagName"))
+USTRUCT(BlueprintType, meta = (HasNativeMake = "EventsRuntime.BlueprintEventLibrary.MakeLiteralEvent", HasNativeBreak = "EventsRuntime.BlueprintEventLibrary.GetTagName"))
 struct EVENTSRUNTIME_API FEventInfo
 {
 	GENERATED_USTRUCT_BODY()
@@ -271,7 +269,7 @@ struct TStructOpsTypeTraits< FEventInfo > : public TStructOpsTypeTraitsBase2< FE
 };
 
 /** A Tag Container holds a collection of FEvents, tags are included explicitly by adding them, and implicitly from adding child tags */
-USTRUCT(BlueprintType, meta = (HasNativeMake = "Events.BlueprintEventLibrary.MakeEventContainerFromArray", HasNativeBreak = "Events.BlueprintEventLibrary.BreakEventContainer"))
+USTRUCT(BlueprintType, meta = (HasNativeMake = "EventsRuntime.BlueprintEventLibrary.MakeEventContainerFromArray", HasNativeBreak = "EventsRuntime.BlueprintEventLibrary.BreakEventContainer"))
 struct EVENTSRUNTIME_API FEventContainer
 {
 	GENERATED_USTRUCT_BODY()
@@ -961,14 +959,14 @@ namespace EEventQueryStreamVersion
  *	Q.BuildQuery(
  *		FEventQueryExpression()
  * 		.AllTagsMatch()
- *		.AddTag(FEventBase::RequestEvent(FName(TEXT("Animal.Mammal.Dog.Corgi"))))
- *		.AddTag(FEventBase::RequestEvent(FName(TEXT("Plant.Tree.Spruce"))))
+ *		.AddTag(FEventInfo::RequestEvent(FName(TEXT("Animal.Mammal.Dog.Corgi"))))
+ *		.AddTag(FEventInfo::RequestEvent(FName(TEXT("Plant.Tree.Spruce"))))
  *		);
  * 
  * Queries are internally represented as a byte stream that is memory-efficient and can be evaluated quickly at runtime.
  * Note: these have an extensive details and graph pin customization for editing, so there is no need to expose the internals to Blueprints.
  */
-USTRUCT(BlueprintType, meta=(HasNativeMake="Events.BlueprintEventLibrary.MakeEventQuery"))
+USTRUCT(BlueprintType, meta=(HasNativeMake="EventsRuntime.BlueprintEventLibrary.MakeEventQuery"))
 struct EVENTSRUNTIME_API FEventQuery
 {
 	GENERATED_BODY();
