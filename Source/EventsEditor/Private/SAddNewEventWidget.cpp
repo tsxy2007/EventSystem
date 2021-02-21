@@ -372,7 +372,7 @@ TSharedRef<class ITableRow> SAddNewEventWidget::OnGenerateParameterRow(TSharedPt
 				if (InItem->PinType != Type)
 				{
 					InItem->PinType = Type;
-					InItem->Type = FName(*FEmitHelper::PinTypeToNativeType(Type));
+					InItem->Type = FName(*UEventSystemBPLibrary::GetParameterType(Type));
 				}
 				if (ListViewWidget.IsValid())
 				{

@@ -111,8 +111,19 @@ FString UEventSystemBPLibrary::GetParameterType(const FEdGraphPinType& Type)
 	};
 
 	FString InnerTypeName = PinTypeToNativeTypeInner(Type);
-	ensure(!Type.IsSet() && !Type.IsMap());
-	return Type.IsArray() ? FString::Printf(TEXT("TArray<%s>"), *InnerTypeName) : InnerTypeName;
+	if (Type.IsArray())
+	{
+		return Type.IsArray() ? FString::Printf(TEXT("TArray<%s>"), *InnerTypeName) : InnerTypeName;
+	}
+	else if (Type.IsSet())
+	{
+		return Type.IsSet() ? FString::Printf(TEXT("TSet<%s>"), *InnerTypeName) : InnerTypeName;
+	}
+	else if (Type.IsMap())
+	{
+		return Type.IsMap() ? FString::Printf(TEXT("TMap<%s,%s>"), *InnerTypeName) : InnerTypeName;
+	}
+	return InnerTypeName;
 }
 
 FString UEventSystemBPLibrary::GetCppName(FFieldVariant Field, bool bUInterface /*= false*/, bool bForceParameterNameModification /*= false*/)

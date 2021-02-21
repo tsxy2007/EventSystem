@@ -41,6 +41,7 @@ public class EventSystemRuntime : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"BlueprintGraph",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
