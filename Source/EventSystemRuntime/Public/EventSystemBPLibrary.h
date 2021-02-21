@@ -29,5 +29,7 @@ class EVENTSYSTEMRUNTIME_API UEventSystemBPLibrary : public UBlueprintFunctionLi
 	GENERATED_UCLASS_BODY()
 
 public:
-	static FName GetParameterType(const FEdGraphPinType& Type);
+	static FString GetParameterType(const FEdGraphPinType& Type);
+	static FString GetCppName(FFieldVariant Field, bool bUInterface = false, bool bForceParameterNameModification = false);
+	static int32 GetInheritenceLevel(const UStruct* Struct);
 };
