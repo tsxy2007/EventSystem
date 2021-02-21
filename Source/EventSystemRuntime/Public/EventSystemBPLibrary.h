@@ -24,8 +24,10 @@
 *	https://wiki.unrealengine.com/Custom_Blueprint_Node_Creation
 */
 UCLASS()
-class UEventSystemBPLibrary : public UBlueprintFunctionLibrary
+class EVENTSYSTEMRUNTIME_API UEventSystemBPLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_UCLASS_BODY()
 
+public:
+	static FName GetParameterType(const FEdGraphPinType& Type);
 };

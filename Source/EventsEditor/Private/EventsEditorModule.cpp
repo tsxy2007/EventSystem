@@ -323,7 +323,7 @@ public:
 		return false;
 	}
 
-	virtual bool AddNewEventToINI(const FString& NewTag, const FString& Comment, FName TagSourceName, bool bIsRestrictedTag, bool bAllowNonRestrictedChildren) override
+	virtual bool AddNewEventToINI(const FString& NewTag, const FString& Comment, FName TagSourceName, TArray<FEventParameter> Parameters, bool bIsRestrictedTag, bool bAllowNonRestrictedChildren) override
 	{
 		UEventsManager& Manager = UEventsManager::Get();
 
@@ -452,7 +452,7 @@ public:
 			{
 				URestrictedEventsList* RestrictedTagList = TagSource->SourceRestrictedTagList;
 				TagListObj = RestrictedTagList;
-				RestrictedTagList->RestrictedEventList.AddUnique(FRestrictedEventTableRow(FName(*NewTag), Comment, bAllowNonRestrictedChildren));
+				RestrictedTagList->RestrictedEventList.AddUnique(FRestrictedEventTableRow(FName(*NewTag), Comment, bAllowNonRestrictedChildren,Parameters));
 				RestrictedTagList->SortTags();
 				ConfigFileName = RestrictedTagList->ConfigFileName;
 				bSuccess = true;
@@ -461,7 +461,7 @@ public:
 			{
 				UEventsList* TagList = TagSource->SourceTagList;
 				TagListObj = TagList;
-				TagList->EventList.AddUnique(FEventTableRow(FName(*NewTag), Comment));
+				TagList->EventList.AddUnique(FEventTableRow(FName(*NewTag), Comment, Parameters));
 				TagList->SortTags();
 				ConfigFileName = TagList->ConfigFileName;
 				bSuccess = true;
@@ -727,7 +727,8 @@ public:
 			// Add new tag if needed
 			if (!Manager.GetTagEditorData(NewTagName, NewComment, NewTagSourceName, bTagIsExplicit, bTagIsRestricted, bTagAllowsNonRestrictedChildren))
 			{
-				if (!AddNewEventToINI(TagToRenameTo, OldComment, OldTagSourceName, bTagIsRestricted, bTagAllowsNonRestrictedChildren))
+				TArray<FEventParameter> ParamterData;
+				if (!AddNewEventToINI(TagToRenameTo, OldComment, OldTagSourceName, ParamterData, bTagIsRestricted, bTagAllowsNonRestrictedChildren))
 				{
 					// Failed to add new tag, so fail
 					return false;

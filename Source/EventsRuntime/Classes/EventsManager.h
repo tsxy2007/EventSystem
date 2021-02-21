@@ -41,7 +41,7 @@ struct FEventTableRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Event)
 	FString DevComment;
 
-	UPROPERTY(EditAnywhere, Category = MessageTag)
+	UPROPERTY(EditAnywhere, Category = Event)
 	TArray<FEventParameter> Parameters;
 
 	/** Constructors */
@@ -69,7 +69,13 @@ struct FRestrictedEventTableRow : public FEventTableRow
 
 	/** Constructors */
 	FRestrictedEventTableRow() : bAllowNonRestrictedChildren(false) {}
-	FRestrictedEventTableRow(FName InTag, const FString& InDevComment = TEXT(""), bool InAllowNonRestrictedChildren = false) : FEventTableRow(InTag, InDevComment), bAllowNonRestrictedChildren(InAllowNonRestrictedChildren) {}
+	FRestrictedEventTableRow(FName InTag, 
+		const FString& InDevComment = TEXT(""), 
+		bool InAllowNonRestrictedChildren = false,
+		const TArray<FEventParameter>& InParameters = {}) :
+		FEventTableRow(InTag, InDevComment,InParameters), 
+		bAllowNonRestrictedChildren(InAllowNonRestrictedChildren) 
+	{}
 	EVENTSRUNTIME_API FRestrictedEventTableRow(FRestrictedEventTableRow const& Other);
 
 	/** Assignment/Equality operators */
@@ -234,7 +240,7 @@ struct FEventNode
 #endif
 		return true;
 	}
-
+	TArray<FEventParameter> Parameters;
 private:
 	/** Raw name for this tag at current rank in the tree */
 	FName Tag;
@@ -683,7 +689,7 @@ private:
 	 *
 	 * @return Index of the node of the tag
 	 */
-	int32 InsertTagIntoNodeArray(FName Tag, FName FullTag, TSharedPtr<FEventNode> ParentNode, TArray< TSharedPtr<FEventNode> >& NodeArray, FName SourceName, const FString& DevComment, bool bIsExplicitTag, bool bIsRestrictedTag, bool bAllowNonRestrictedChildren);
+	int32 InsertTagIntoNodeArray(FName Tag, FName FullTag, TSharedPtr<FEventNode> ParentNode, TArray< TSharedPtr<FEventNode> >& NodeArray, FName SourceName, const FEventTableRow& TagRow, const FString& DevComment, bool bIsExplicitTag, bool bIsRestrictedTag, bool bAllowNonRestrictedChildren);
 
 	/** Helper function to populate the tag tree from each table */
 	void PopulateTreeFromDataTable(class UDataTable* Table);

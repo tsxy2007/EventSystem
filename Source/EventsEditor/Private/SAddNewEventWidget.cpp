@@ -10,6 +10,8 @@
 #include "PropertyCustomizationHelpers.h"
 #include "SPinTypeSelector.h"
 #include "UnrealCompatibility.h"
+#include "EventSystemBPLibrary.h"
+#include "BlueprintCompilerCppBackend/Private/BlueprintCompilerCppBackendUtils.h"
 
 #define LOCTEXT_NAMESPACE "AddNewEventWidget"
 
@@ -292,6 +294,7 @@ void SAddNewEventWidget::CreateNewEvent()
 
 	FText TagNameAsText = TagNameTextBox->GetText();
 	FString TagName = TagNameAsText.ToString();
+	FString TagComment = "";
 	FName TagSource = *TagSourcesComboBox->GetSelectedItem().Get();
 
 	if (TagName.IsEmpty())
@@ -311,12 +314,19 @@ void SAddNewEventWidget::CreateNewEvent()
 		return;
 	}
 
+
 	// set bIsAddingNewTag, this guards against the window closing when it loses focus due to source control checking out a file
 	TGuardValue<bool>	Guard(bAddingNewTag, true);
 
-	//IEventsEditorModule::Get().AddNewEventToINI(TagName, TagComment, TagSource);
+	TArray<FEventParameter> ParamterData;
+	for (auto EventParam : MessageTables)
+	{
+		ParamterData.Add({ EventParam->Name, EventParam->Type });
+	}
 
-	//OnEventAdded.ExecuteIfBound(TagName, TagComment, TagSource);
+	IEventsEditorModule::Get().AddNewEventToINI(TagName, TagComment, TagSource,ParamterData);
+
+	OnEventAdded.ExecuteIfBound(TagName, TagComment, TagSource);
 
 	Reset(EResetType::DoNotResetSource);
 }
@@ -362,7 +372,7 @@ TSharedRef<class ITableRow> SAddNewEventWidget::OnGenerateParameterRow(TSharedPt
 				if (InItem->PinType != Type)
 				{
 					InItem->PinType = Type;
-					//InItem->Type = GMPReflection::GetPinPropertyName(Type);
+					InItem->Type = FName(*FEmitHelper::PinTypeToNativeType(Type));
 				}
 				if (ListViewWidget.IsValid())
 				{

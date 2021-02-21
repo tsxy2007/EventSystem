@@ -372,7 +372,8 @@ void SAddNewRestrictedEventWidget::CreateNewRestrictedEvent()
 	// set bIsAddingNewTag, this guards against the window closing when it loses focus due to source control checking out a file
 	TGuardValue<bool>	Guard(bAddingNewRestrictedTag, true);
 
-	IEventsEditorModule::Get().AddNewEventToINI(TagName, TagComment, TagSource, true, bAllowNonRestrictedChildren);
+	TArray<FEventParameter> ParameterData;
+	IEventsEditorModule::Get().AddNewEventToINI(TagName, TagComment, TagSource, ParameterData, true, bAllowNonRestrictedChildren);
 
 	OnRestrictedEventAdded.ExecuteIfBound(TagName, TagComment, TagSource);
 

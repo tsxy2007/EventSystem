@@ -882,7 +882,7 @@ void UEventsManager::AddTagTableRow(const FEventTableRow& TagRow, FName SourceNa
 		}
 			
 		TArray< TSharedPtr<FEventNode> >& ChildTags = CurNode.Get()->GetChildTagNodes();
-		int32 InsertionIdx = InsertTagIntoNodeArray(ShortTagName, FullTagName, CurNode, ChildTags, SourceName, TagRow.DevComment, bIsExplicitTag, bIsRestrictedTag, bAllowNonRestrictedChildren);
+		int32 InsertionIdx = InsertTagIntoNodeArray(ShortTagName, FullTagName, CurNode, ChildTags, SourceName,TagRow, TagRow.DevComment, bIsExplicitTag, bIsRestrictedTag, bAllowNonRestrictedChildren);
 
 		CurNode = ChildTags[InsertionIdx];
 
@@ -960,7 +960,7 @@ bool UEventsManager::IsNativelyAddedTag(FEventInfo Tag) const
 	return NativeTagsToAdd.Contains(Tag.GetTagName());
 }
 
-int32 UEventsManager::InsertTagIntoNodeArray(FName Tag, FName FullTag, TSharedPtr<FEventNode> ParentNode, TArray< TSharedPtr<FEventNode> >& NodeArray, FName SourceName, const FString& DevComment, bool bIsExplicitTag, bool bIsRestrictedTag, bool bAllowNonRestrictedChildren)
+int32 UEventsManager::InsertTagIntoNodeArray(FName Tag, FName FullTag, TSharedPtr<FEventNode> ParentNode, TArray< TSharedPtr<FEventNode> >& NodeArray, FName SourceName, const FEventTableRow& TagRow, const FString& DevComment, bool bIsExplicitTag, bool bIsRestrictedTag, bool bAllowNonRestrictedChildren)
 {
 	int32 FoundNodeIdx = INDEX_NONE;
 	int32 WhereToInsert = INDEX_NONE;
@@ -1017,6 +1017,8 @@ int32 UEventsManager::InsertTagIntoNodeArray(FName Tag, FName FullTag, TSharedPt
 
 		// Don't add the root node as parent
 		TSharedPtr<FEventNode> TagNode = MakeShareable(new FEventNode(Tag, FullTag, ParentNode != GameplayRootTag ? ParentNode : nullptr, bIsExplicitTag, bIsRestrictedTag, bAllowNonRestrictedChildren));
+
+		TagNode->Parameters = TagRow.Parameters;
 
 		// Add at the sorted location
 		FoundNodeIdx = NodeArray.Insert(TagNode, WhereToInsert);
@@ -1953,7 +1955,7 @@ FEventTableRow& FEventTableRow::operator=(FEventTableRow const& Other)
 
 	Tag = Other.Tag;
 	DevComment = Other.DevComment;
-
+	Parameters = Other.Parameters;
 	return *this;
 }
 

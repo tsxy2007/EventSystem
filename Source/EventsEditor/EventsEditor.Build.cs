@@ -38,6 +38,8 @@ namespace UnrealBuildTool.Rules
 					"ToolMenus",
 					"KismetWidgets",
 					"PropertyEditor",
+					"EventSystemRuntime",
+					"BlueprintCompilerCppBackend",
 				}
 			);
 
