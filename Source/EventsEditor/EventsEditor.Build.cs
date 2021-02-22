@@ -40,6 +40,7 @@ namespace UnrealBuildTool.Rules
 					"PropertyEditor",
 					"EventSystemRuntime",
 					"BlueprintCompilerCppBackend",
+					"ContentBrowserData",
 				}
 			);
 

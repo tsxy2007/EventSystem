@@ -121,7 +121,8 @@ FString UEventSystemBPLibrary::GetParameterType(const FEdGraphPinType& Type)
 	}
 	else if (Type.IsMap())
 	{
-		return Type.IsMap() ? FString::Printf(TEXT("TMap<%s,%s>"), *InnerTypeName) : InnerTypeName;
+		UE_LOG(LogTemp, Warning, TEXT("TMap Value %s ,Key "), *InnerTypeName);
+		return Type.IsMap() ? FString::Printf(TEXT("TMap<%s,%s>"), *InnerTypeName, *InnerTypeName) : InnerTypeName;
 	}
 	return InnerTypeName;
 }
