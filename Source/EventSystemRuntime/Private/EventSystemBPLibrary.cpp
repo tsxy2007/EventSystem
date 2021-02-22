@@ -121,7 +121,14 @@ FString UEventSystemBPLibrary::GetParameterType(const FEdGraphPinType& Type)
 	}
 	else if (Type.IsMap())
 	{
-		return Type.IsMap() ? FString::Printf(TEXT("TMap<%s,%s>"), *InnerTypeName) : InnerTypeName;
+		FEdGraphPinType ValuePinType;
+		ValuePinType.PinCategory = Type.PinValueType.TerminalCategory;
+		ValuePinType.PinSubCategory = Type.PinValueType.TerminalSubCategory;
+		ValuePinType.PinSubCategoryObject = Type.PinValueType.TerminalSubCategoryObject;
+		ValuePinType.bIsWeakPointer = Type.PinValueType.bTerminalIsWeakPointer;
+		auto KeyType = Type;
+		KeyType.ContainerType = EPinContainerType::None;
+		return FString::Printf(TEXT("TMap<%s,%s>"), *PinTypeToNativeTypeInner(KeyType),*PinTypeToNativeTypeInner(ValuePinType));
 	}
 	return InnerTypeName;
 }
