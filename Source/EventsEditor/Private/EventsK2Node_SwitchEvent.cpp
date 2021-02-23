@@ -67,7 +67,7 @@ void UEventsK2Node_SwitchEvent::PostEditChangeProperty(struct FPropertyChangedEv
 
 FText UEventsK2Node_SwitchEvent::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
-	return NSLOCTEXT("K2Node", "Switch_Tag", "Switch on Gameplay Tag");
+	return NSLOCTEXT("K2Node", "Switch_Tag", "Switch on Event");
 }
 
 FText UEventsK2Node_SwitchEvent::GetTooltipText() const
