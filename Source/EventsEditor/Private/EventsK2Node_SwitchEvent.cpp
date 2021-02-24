@@ -67,12 +67,12 @@ void UEventsK2Node_SwitchEvent::PostEditChangeProperty(struct FPropertyChangedEv
 
 FText UEventsK2Node_SwitchEvent::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
-	return NSLOCTEXT("K2Node", "Switch_Tag", "Switch on Event");
+	return NSLOCTEXT("K2Node", "Switch_EVENT_Tag", "Switch on Event");
 }
 
 FText UEventsK2Node_SwitchEvent::GetTooltipText() const
 {
-	return NSLOCTEXT("K2Node", "SwitchTag_ToolTip", "Selects an output that matches the input value");
+	return NSLOCTEXT("K2Node", "SwitchTag_EVENT_ToolTip", "Selects an output that matches the input value");
 }
 
 void UEventsK2Node_SwitchEvent::GetMenuActions(FBlueprintActionDatabaseRegistrar& ActionRegistrar) const
