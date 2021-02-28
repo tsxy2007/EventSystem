@@ -59,7 +59,7 @@ FString UEventSystemBPLibrary::GetParameterType(const FEdGraphPinType& Type)
 		{
 			if (UScriptStruct* Struct = Cast<UScriptStruct>(InType.PinSubCategoryObject.Get()))
 			{
-				return UEventSystemBPLibrary::GetCppName(Struct);
+				return UEventSystemBPLibrary::GetCppName(Struct);//InType.PinCategory.ToString();//
 			}
 		}
 		else if (UEdGraphSchema_K2::PC_Class == InType.PinCategory)
@@ -94,7 +94,7 @@ FString UEventSystemBPLibrary::GetParameterType(const FEdGraphPinType& Type)
 		{
 			if (UClass* Class = Cast<UClass>(InType.PinSubCategoryObject.Get()))
 			{
-				return FString::Printf(TEXT("%s*"), *UEventSystemBPLibrary::GetCppName(Class));
+				return FString::Printf(TEXT("%s"), *UEventSystemBPLibrary::GetCppName(Class));
 			}
 		}
 		else if (UEdGraphSchema_K2::PC_FieldPath == InType.PinCategory)
@@ -111,6 +111,7 @@ FString UEventSystemBPLibrary::GetParameterType(const FEdGraphPinType& Type)
 	};
 
 	FString InnerTypeName = PinTypeToNativeTypeInner(Type);
+
 	if (Type.IsArray())
 	{
 		return Type.IsArray() ? FString::Printf(TEXT("TArray<%s>"), *InnerTypeName) : InnerTypeName;
@@ -140,6 +141,14 @@ FString UEventSystemBPLibrary::GetCppName(FFieldVariant Field, bool bUInterface 
 	const UScriptStruct* AsScriptStruct = Field.Get<UScriptStruct>();
 	if (AsClass || AsScriptStruct)
 	{
+		if (AsClass)
+		{
+			return *AsClass->GetName();
+		}
+		else
+		{
+			return *AsScriptStruct->GetName();
+		}
 		if (AsClass && AsClass->HasAnyClassFlags(CLASS_Interface))
 		{
 			ensure(AsClass->IsChildOf<UInterface>());
