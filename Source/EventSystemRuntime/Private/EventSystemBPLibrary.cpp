@@ -111,7 +111,6 @@ FString UEventSystemBPLibrary::GetParameterType(const FEdGraphPinType& Type)
 	};
 
 	FString InnerTypeName = PinTypeToNativeTypeInner(Type);
-
 	if (Type.IsArray())
 	{
 		return Type.IsArray() ? FString::Printf(TEXT("TArray<%s>"), *InnerTypeName) : InnerTypeName;
