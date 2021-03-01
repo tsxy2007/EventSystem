@@ -40,8 +40,8 @@ namespace UnrealBuildTool.Rules
 					"PropertyEditor",
 					"EventSystemRuntime",
 					"BlueprintCompilerCppBackend",
-					"ContentBrowserData",
-				}
+                    "ContentBrowserData",
+                }
 			);
 
 			PrivateIncludePathModuleNames.AddRange(
