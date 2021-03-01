@@ -258,9 +258,10 @@ FReply SAddNewEventWidget::OnAddNewParameterButtonPressed()
 {
 	static FEdGraphPinType StringType;
 	StringType.PinCategory = UEdGraphSchema_K2::PC_String;
+	FString PinTypeStr = UEventSystemBPLibrary::GetParameterType(StringType);
 	auto& Ref = Add_GetRef(MessageTables, MakeShared<FEventParameterDetail>());
 	Ref->Name = *FString::Printf(TEXT("Param%d"), MessageTables.Num() - 1);
-	Ref->Type = TEXT("String");
+	Ref->Type = *PinTypeStr;
 	Ref->PinType = StringType;
 
 	ListViewWidget->RequestListRefresh();

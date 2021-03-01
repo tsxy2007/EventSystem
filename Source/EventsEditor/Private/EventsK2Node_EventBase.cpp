@@ -32,7 +32,22 @@ void UEventsK2Node_EventBase::PinDefaultValueChanged(UEdGraphPin* Pin)
 {
 	if (Pin == GetEventPin())
 	{
-		//DoRebuild();
+	
+		TArray<UEdGraphPin*> OldPins = Pins;
+		TArray<UEdGraphPin*> RemovedPins;
+		for (int32 PinIdx = Pins.Num() - 1; PinIdx > 0; PinIdx--)
+		{
+			if (!Pins[PinIdx])
+			{
+				continue;
+			}
+			if (Pins[PinIdx]->PinName.ToString().StartsWith(MessageParamPrefix))
+			{
+				RemovedPins.Add(Pins[PinIdx]);
+				Pins.RemoveAt(PinIdx);
+			}
+		}
+
 		FString MsgKey = Pin->GetDefaultAsString();
 		FString Left;
 		FString Right;
@@ -52,9 +67,13 @@ void UEventsK2Node_EventBase::PinDefaultValueChanged(UEdGraphPin* Pin)
 				}
 			}
 		}
-		Super::PinDefaultValueChanged(Pin);
-
+#if ENGINE_MINOR_VERSION < 20
+		RewireOldPinsToNewPins(RemovedPins, Pins);
+#else
+		RewireOldPinsToNewPins(RemovedPins, Pins, nullptr);
+#endif
 		GetGraph()->NotifyGraphChanged();
+		Super::PinDefaultValueChanged(Pin);
 		return;
 	}
 
@@ -72,6 +91,8 @@ void UEventsK2Node_EventBase::PinDefaultValueChanged(UEdGraphPin* Pin)
 	//	}
 	//}
 }
+
+FString UEventsK2Node_EventBase::MessageParamPrefix = TEXT("Param");
 
 void UEventsK2Node_EventBase::AllocateDefaultPins()
 {

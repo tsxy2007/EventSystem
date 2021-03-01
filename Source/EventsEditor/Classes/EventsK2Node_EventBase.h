@@ -26,7 +26,7 @@ class UEventsK2Node_EventBase : public UK2Node
 	UPROPERTY()
 	TArray<FName> PinNames;
 
-
+	static FString MessageParamPrefix;
 	virtual void AllocateDefaultPins() override;
 	// UObject interface
 	virtual void PostLoad() override;
