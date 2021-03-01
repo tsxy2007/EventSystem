@@ -3,6 +3,7 @@
 #include "EventSystemBPLibrary.h"
 #include "EdGraphSchema_K2.h"
 #include "Engine/UserDefinedEnum.h"
+#include "JsonUtilities/Public/JsonObjectConverter.h"
 extern ENGINE_API FString GetPathPostfix(const UObject* ForObject);
 UEventSystemBPLibrary::UEventSystemBPLibrary(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
@@ -12,126 +13,128 @@ UEventSystemBPLibrary::UEventSystemBPLibrary(const FObjectInitializer& ObjectIni
 
 FString UEventSystemBPLibrary::GetParameterType(const FEdGraphPinType& Type)
 {// A temp uproperty should be generated?
-	auto PinTypeToNativeTypeInner = [](const FEdGraphPinType& InType) -> FString
-	{
-		if (UEdGraphSchema_K2::PC_String == InType.PinCategory)
-		{
-			return TEXT("FString");
-		}
-		else if (UEdGraphSchema_K2::PC_Boolean == InType.PinCategory)
-		{
-			return TEXT("bool");
-		}
-		else if ((UEdGraphSchema_K2::PC_Byte == InType.PinCategory) || (UEdGraphSchema_K2::PC_Enum == InType.PinCategory))
-		{
-			if (UEnum* Enum = Cast<UEnum>(InType.PinSubCategoryObject.Get()))
-			{
-				const bool bEnumClassForm = Enum->GetCppForm() == UEnum::ECppForm::EnumClass;
-				const bool bNonNativeEnum = Enum->GetClass() != UEnum::StaticClass();
-				ensure(!bNonNativeEnum || Enum->CppType.IsEmpty());
-				const FString FullyQualifiedEnumName = (!Enum->CppType.IsEmpty()) ? Enum->CppType : UEventSystemBPLibrary::GetCppName(Enum);
-				// TODO: sometimes we need unwrapped type for enums without size specified. For example when native function has a raw ref param.
-				return (bEnumClassForm || bNonNativeEnum) ? FullyQualifiedEnumName : FString::Printf(TEXT("TEnumAsByte<%s>"), *FullyQualifiedEnumName);
-			}
-			return TEXT("uint8");
-		}
-		else if (UEdGraphSchema_K2::PC_Int == InType.PinCategory)
-		{
-			return TEXT("int32");
-		}
-		else if (UEdGraphSchema_K2::PC_Int64 == InType.PinCategory)
-		{
-			return TEXT("int64");
-		}
-		else if (UEdGraphSchema_K2::PC_Float == InType.PinCategory)
-		{
-			return TEXT("float");
-		}
-		else if (UEdGraphSchema_K2::PC_Name == InType.PinCategory)
-		{
-			return TEXT("FName");
-		}
-		else if (UEdGraphSchema_K2::PC_Text == InType.PinCategory)
-		{
-			return TEXT("FText");
-		}
-		else if (UEdGraphSchema_K2::PC_Struct == InType.PinCategory)
-		{
-			if (UScriptStruct* Struct = Cast<UScriptStruct>(InType.PinSubCategoryObject.Get()))
-			{
-				return UEventSystemBPLibrary::GetCppName(Struct);//InType.PinCategory.ToString();//
-			}
-		}
-		else if (UEdGraphSchema_K2::PC_Class == InType.PinCategory)
-		{
-			if (UClass* Class = Cast<UClass>(InType.PinSubCategoryObject.Get()))
-			{
-				return FString::Printf(TEXT("TSubclassOf<%s>"), *UEventSystemBPLibrary::GetCppName(Class));
-			}
-		}
-		else if (UEdGraphSchema_K2::PC_SoftClass == InType.PinCategory)
-		{
-			if (UClass* Class = Cast<UClass>(InType.PinSubCategoryObject.Get()))
-			{
-				return FString::Printf(TEXT("TSoftClassPtr<%s>"), *UEventSystemBPLibrary::GetCppName(Class));
-			}
-		}
-		else if (UEdGraphSchema_K2::PC_Interface == InType.PinCategory)
-		{
-			if (UClass* Class = Cast<UClass>(InType.PinSubCategoryObject.Get()))
-			{
-				return FString::Printf(TEXT("TScriptInterface<%s>"), *UEventSystemBPLibrary::GetCppName(Class));
-			}
-		}
-		else if (UEdGraphSchema_K2::PC_SoftObject == InType.PinCategory)
-		{
-			if (UClass* Class = Cast<UClass>(InType.PinSubCategoryObject.Get()))
-			{
-				return FString::Printf(TEXT("TSoftObjectPtr<%s>"), *UEventSystemBPLibrary::GetCppName(Class));
-			}
-		}
-		else if (UEdGraphSchema_K2::PC_Object == InType.PinCategory)
-		{
-			if (UClass* Class = Cast<UClass>(InType.PinSubCategoryObject.Get()))
-			{
-				return FString::Printf(TEXT("%s"), *UEventSystemBPLibrary::GetCppName(Class));
-			}
-		}
-		else if (UEdGraphSchema_K2::PC_FieldPath == InType.PinCategory)
-		{
-			// @todo: FProp
-			check(false);
-			//if (UClass* Class = Cast<UClass>(InType.PinSubCategoryObject.Get()))
-			//{
-			//	return FString::Printf(TEXT("TSoftObjectPtr<%s>"), *FEmitHelper::GetCppName(Class));
-			//}
-		}
-		//UE_LOG(LogK2Compiler, Error, TEXT("FEmitHelper::DefaultValue cannot generate an array type"));
-		return FString{};
-	};
+	//auto PinTypeToNativeTypeInner = [](const FEdGraphPinType& InType) -> FString
+	//{
+	//	if (UEdGraphSchema_K2::PC_String == InType.PinCategory)
+	//	{
+	//		return TEXT("FString");
+	//	}
+	//	else if (UEdGraphSchema_K2::PC_Boolean == InType.PinCategory)
+	//	{
+	//		return TEXT("bool");
+	//	}
+	//	else if ((UEdGraphSchema_K2::PC_Byte == InType.PinCategory) || (UEdGraphSchema_K2::PC_Enum == InType.PinCategory))
+	//	{
+	//		if (UEnum* Enum = Cast<UEnum>(InType.PinSubCategoryObject.Get()))
+	//		{
+	//			const bool bEnumClassForm = Enum->GetCppForm() == UEnum::ECppForm::EnumClass;
+	//			const bool bNonNativeEnum = Enum->GetClass() != UEnum::StaticClass();
+	//			ensure(!bNonNativeEnum || Enum->CppType.IsEmpty());
+	//			const FString FullyQualifiedEnumName = (!Enum->CppType.IsEmpty()) ? Enum->CppType : UEventSystemBPLibrary::GetCppName(Enum);
+	//			// TODO: sometimes we need unwrapped type for enums without size specified. For example when native function has a raw ref param.
+	//			return (bEnumClassForm || bNonNativeEnum) ? FullyQualifiedEnumName : FString::Printf(TEXT("TEnumAsByte<%s>"), *FullyQualifiedEnumName);
+	//		}
+	//		return TEXT("uint8");
+	//	}
+	//	else if (UEdGraphSchema_K2::PC_Int == InType.PinCategory)
+	//	{
+	//		return TEXT("int32");
+	//	}
+	//	else if (UEdGraphSchema_K2::PC_Int64 == InType.PinCategory)
+	//	{
+	//		return TEXT("int64");
+	//	}
+	//	else if (UEdGraphSchema_K2::PC_Float == InType.PinCategory)
+	//	{
+	//		return TEXT("float");
+	//	}
+	//	else if (UEdGraphSchema_K2::PC_Name == InType.PinCategory)
+	//	{
+	//		return TEXT("FName");
+	//	}
+	//	else if (UEdGraphSchema_K2::PC_Text == InType.PinCategory)
+	//	{
+	//		return TEXT("FText");
+	//	}
+	//	else if (UEdGraphSchema_K2::PC_Struct == InType.PinCategory)
+	//	{
+	//		if (UScriptStruct* Struct = Cast<UScriptStruct>(InType.PinSubCategoryObject.Get()))
+	//		{
+	//			return UEventSystemBPLibrary::GetCppName(Struct);//InType.PinCategory.ToString();//
+	//		}
+	//	}
+	//	else if (UEdGraphSchema_K2::PC_Class == InType.PinCategory)
+	//	{
+	//		if (UClass* Class = Cast<UClass>(InType.PinSubCategoryObject.Get()))
+	//		{
+	//			return FString::Printf(TEXT("TSubclassOf<%s>"), *UEventSystemBPLibrary::GetCppName(Class));
+	//		}
+	//	}
+	//	else if (UEdGraphSchema_K2::PC_SoftClass == InType.PinCategory)
+	//	{
+	//		if (UClass* Class = Cast<UClass>(InType.PinSubCategoryObject.Get()))
+	//		{
+	//			return FString::Printf(TEXT("TSoftClassPtr<%s>"), *UEventSystemBPLibrary::GetCppName(Class));
+	//		}
+	//	}
+	//	else if (UEdGraphSchema_K2::PC_Interface == InType.PinCategory)
+	//	{
+	//		if (UClass* Class = Cast<UClass>(InType.PinSubCategoryObject.Get()))
+	//		{
+	//			return FString::Printf(TEXT("TScriptInterface<%s>"), *UEventSystemBPLibrary::GetCppName(Class));
+	//		}
+	//	}
+	//	else if (UEdGraphSchema_K2::PC_SoftObject == InType.PinCategory)
+	//	{
+	//		if (UClass* Class = Cast<UClass>(InType.PinSubCategoryObject.Get()))
+	//		{
+	//			return FString::Printf(TEXT("TSoftObjectPtr<%s>"), *UEventSystemBPLibrary::GetCppName(Class));
+	//		}
+	//	}
+	//	else if (UEdGraphSchema_K2::PC_Object == InType.PinCategory)
+	//	{
+	//		if (UClass* Class = Cast<UClass>(InType.PinSubCategoryObject.Get()))
+	//		{
+	//			return FString::Printf(TEXT("%s"), *UEventSystemBPLibrary::GetCppName(Class));
+	//		}
+	//	}
+	//	else if (UEdGraphSchema_K2::PC_FieldPath == InType.PinCategory)
+	//	{
+	//		// @todo: FProp
+	//		check(false);
+	//		//if (UClass* Class = Cast<UClass>(InType.PinSubCategoryObject.Get()))
+	//		//{
+	//		//	return FString::Printf(TEXT("TSoftObjectPtr<%s>"), *FEmitHelper::GetCppName(Class));
+	//		//}
+	//	}
+	//	//UE_LOG(LogK2Compiler, Error, TEXT("FEmitHelper::DefaultValue cannot generate an array type"));
+	//	return FString{};
+	//};
 
-	FString InnerTypeName = PinTypeToNativeTypeInner(Type);
+	//FString InnerTypeName = PinTypeToNativeTypeInner(Type);
 
-	if (Type.IsArray())
-	{
-		return Type.IsArray() ? FString::Printf(TEXT("TArray<%s>"), *InnerTypeName) : InnerTypeName;
-	}
-	else if (Type.IsSet())
-	{
-		return Type.IsSet() ? FString::Printf(TEXT("TSet<%s>"), *InnerTypeName) : InnerTypeName;
-	}
-	else if (Type.IsMap())
-	{
-		FEdGraphPinType ValuePinType;
-		ValuePinType.PinCategory = Type.PinValueType.TerminalCategory;
-		ValuePinType.PinSubCategory = Type.PinValueType.TerminalSubCategory;
-		ValuePinType.PinSubCategoryObject = Type.PinValueType.TerminalSubCategoryObject;
-		ValuePinType.bIsWeakPointer = Type.PinValueType.bTerminalIsWeakPointer;
-		auto KeyType = Type;
-		KeyType.ContainerType = EPinContainerType::None;
-		return FString::Printf(TEXT("TMap<%s,%s>"), *PinTypeToNativeTypeInner(KeyType),*PinTypeToNativeTypeInner(ValuePinType));
-	}
-	return InnerTypeName;
+	//if (Type.IsArray())
+	//{
+	//	return Type.IsArray() ? FString::Printf(TEXT("TArray<%s>"), *InnerTypeName) : InnerTypeName;
+	//}
+	//else if (Type.IsSet())
+	//{
+	//	return Type.IsSet() ? FString::Printf(TEXT("TSet<%s>"), *InnerTypeName) : InnerTypeName;
+	//}
+	//else if (Type.IsMap())
+	//{
+	//	FEdGraphPinType ValuePinType;
+	//	ValuePinType.PinCategory = Type.PinValueType.TerminalCategory;
+	//	ValuePinType.PinSubCategory = Type.PinValueType.TerminalSubCategory;
+	//	ValuePinType.PinSubCategoryObject = Type.PinValueType.TerminalSubCategoryObject;
+	//	ValuePinType.bIsWeakPointer = Type.PinValueType.bTerminalIsWeakPointer;
+	//	auto KeyType = Type;
+	//	KeyType.ContainerType = EPinContainerType::None;
+	//	return FString::Printf(TEXT("TMap<%s,%s>"), *PinTypeToNativeTypeInner(KeyType),*PinTypeToNativeTypeInner(ValuePinType));
+	//}
+	FString SyncStatusJsonString;
+	const bool bJsonStringOk = FJsonObjectConverter::UStructToJsonObjectString(Type, SyncStatusJsonString);
+	return SyncStatusJsonString;
 }
 
 FString UEventSystemBPLibrary::GetCppName(FFieldVariant Field, bool bUInterface /*= false*/, bool bForceParameterNameModification /*= false*/)
@@ -141,14 +144,6 @@ FString UEventSystemBPLibrary::GetCppName(FFieldVariant Field, bool bUInterface 
 	const UScriptStruct* AsScriptStruct = Field.Get<UScriptStruct>();
 	if (AsClass || AsScriptStruct)
 	{
-		if (AsClass)
-		{
-			return *AsClass->GetName();
-		}
-		else
-		{
-			return *AsScriptStruct->GetName();
-		}
 		if (AsClass && AsClass->HasAnyClassFlags(CLASS_Interface))
 		{
 			ensure(AsClass->IsChildOf<UInterface>());
@@ -223,4 +218,13 @@ int32 UEventSystemBPLibrary::GetInheritenceLevel(const UStruct* Struct)
 		StructIt = StructIt->GetSuperStruct();
 	}
 	return InheritenceLevel;
+}
+
+bool UEventSystemBPLibrary::GetPinTypeFromStr(const FString& PinTypeStr, FEdGraphPinType& PinType)
+{
+	if (FJsonObjectConverter::JsonObjectStringToUStruct(PinTypeStr, &PinType, 0, 0))
+	{
+		return true;
+	}
+	return false;
 }

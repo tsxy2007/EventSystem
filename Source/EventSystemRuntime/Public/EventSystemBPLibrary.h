@@ -32,4 +32,5 @@ public:
 	static FString GetParameterType(const FEdGraphPinType& Type);
 	static FString GetCppName(FFieldVariant Field, bool bUInterface = false, bool bForceParameterNameModification = false);
 	static int32 GetInheritenceLevel(const UStruct* Struct);
+	static bool GetPinTypeFromStr(const FString& PinTypeStr, FEdGraphPinType& PinType);
 };
