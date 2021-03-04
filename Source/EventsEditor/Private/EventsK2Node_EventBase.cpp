@@ -13,6 +13,7 @@ namespace
 {
 	static FName DefaultPinName(TEXT("Default"));
 	static FName EventPinName(TEXT("CustomEvent"));
+	static FName SenderPinName(TEXT("Sernder"));
 }
 
 
@@ -98,6 +99,7 @@ void UEventsK2Node_EventBase::AllocateDefaultPins()
 {
 	CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Then);
 	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Then);
+	CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Object, UEdGraphSchema_K2::PSC_Self, UEdGraphSchema_K2::PN_Self);
 	CreateSelectionPin();
 }
 
