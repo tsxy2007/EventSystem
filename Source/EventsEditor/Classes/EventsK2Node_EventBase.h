@@ -31,6 +31,7 @@ class UEventsK2Node_EventBase : public UK2Node
 	// UObject interface
 	virtual void PostLoad() override;
 	virtual void PinDefaultValueChanged(UEdGraphPin* Pin) override;
+	virtual void ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph) override;
 	// End of UObject interface
 
 	// UEdGraphNode interface

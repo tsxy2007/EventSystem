@@ -228,3 +228,14 @@ bool UEventSystemBPLibrary::GetPinTypeFromStr(const FString& PinTypeStr, FEdGrap
 	}
 	return false;
 }
+
+
+void UEventSystemBPLibrary::NotifyMessageByKeyVariadic(const FString& MessageId, UObject* Sender, uint8 Type /*= 0*/)
+{
+
+}
+
+DEFINE_FUNCTION(UEventSystemBPLibrary::execNotifyMessageByKeyVariadic)
+{
+	
+}

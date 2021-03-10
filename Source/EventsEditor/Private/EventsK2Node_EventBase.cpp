@@ -8,6 +8,9 @@
 #include "BlueprintEventLibrary.h"
 #include "EventsManager.h"
 #include "EventSystemBPLibrary.h"
+#include "K2Node_CallFunction.h"
+#include "KismetCompilerMisc.h"
+#include "KismetCompiler.h"
 
 namespace
 {
@@ -91,6 +94,19 @@ void UEventsK2Node_EventBase::PinDefaultValueChanged(UEdGraphPin* Pin)
 	//		ModifyUserDefinedPinDefaultValue(PinInfo, Pin->GetDefaultAsString());
 	//	}
 	//}
+}
+
+void UEventsK2Node_EventBase::ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph)
+{
+	Super::ExpandNode(CompilerContext, SourceGraph);
+	static const FName FuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, NotifyMessageByKeyVariadic);
+
+	UEventsK2Node_EventBase* SpawnNode = this;
+	UEdGraphPin* EventExec = SpawnNode->GetExecPin();
+
+	UK2Node_CallFunction* CallNotifyFuncNode = CompilerContext.SpawnIntermediateNode<UK2Node_CallFunction>(SpawnNode, SourceGraph);
+	CallNotifyFuncNode->FunctionReference.SetExternalMember(FuncName, UEventSystemBPLibrary::StaticClass());
+	CallNotifyFuncNode->AllocateDefaultPins();
 }
 
 FString UEventsK2Node_EventBase::MessageParamPrefix = TEXT("Param");

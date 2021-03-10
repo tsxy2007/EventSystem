@@ -33,4 +33,10 @@ public:
 	static FString GetCppName(FFieldVariant Field, bool bUInterface = false, bool bForceParameterNameModification = false);
 	static int32 GetInheritenceLevel(const UStruct* Struct);
 	static bool GetPinTypeFromStr(const FString& PinTypeStr, FEdGraphPinType& PinType);
+
+public:
+	UFUNCTION(BlueprintCallable, CustomThunk, meta = (CallableWithoutWorldContext, BlueprintInternalUseOnly = true, HidePin = "Sender", DefaultToSelf = "Sender", AutoCreateRefTerm = "MessageId", Variadic))
+	static void NotifyMessageByKeyVariadic(const FString& MessageId, UObject* Sender, uint8 Type = 0);
+	DECLARE_FUNCTION(execNotifyMessageByKeyVariadic);
+
 };
