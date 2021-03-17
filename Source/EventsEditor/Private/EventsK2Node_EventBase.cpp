@@ -48,6 +48,7 @@ void UEventsK2Node_EventBase::PinDefaultValueChanged(UEdGraphPin* Pin)
 			if (Pins[PinIdx]->PinName.ToString().StartsWith(MessageParamPrefix))
 			{
 				RemovedPins.Add(Pins[PinIdx]);
+				PinNames.Remove(Pins[PinIdx]->PinName);
 				Pins.RemoveAt(PinIdx);
 			}
 		}
@@ -67,14 +68,16 @@ void UEventsK2Node_EventBase::PinDefaultValueChanged(UEdGraphPin* Pin)
 				FEdGraphPinType PinType;
 				if (UEventSystemBPLibrary::GetPinTypeFromStr(ParamterInfo.Type.ToString(), PinType))
 				{
-					CreatePin(EGPD_Input, PinType, ParamterInfo.Name);
+					const FName PinName(GetUniquePinName());
+					CreatePin(EGPD_Input, PinType, PinName);
+					PinNames.Add(PinName);
 				}
 			}
 		}
 #if ENGINE_MINOR_VERSION < 20
 		RewireOldPinsToNewPins(RemovedPins, Pins);
 #else
-		RewireOldPinsToNewPins(RemovedPins, Pins, nullptr);
+		RewireOldPinsToNewPins(RemovedPins, Pins);
 #endif
 		GetGraph()->NotifyGraphChanged();
 		Super::PinDefaultValueChanged(Pin);
@@ -102,18 +105,39 @@ void UEventsK2Node_EventBase::ExpandNode(class FKismetCompilerContext& CompilerC
 	static const FName FuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, NotifyMessageByKeyVariadic);
 
 	UEventsK2Node_EventBase* SpawnNode = this;
-	UEdGraphPin* EventExec = SpawnNode->GetExecPin();
+	UEdGraphPin* EventExec = GetExecPin();
+	UEdGraphPin* MsgPin = GetEventPin();
+	UEdGraphPin* SenderPin = GetSenderPin();
+
 
 	UK2Node_CallFunction* CallNotifyFuncNode = CompilerContext.SpawnIntermediateNode<UK2Node_CallFunction>(SpawnNode, SourceGraph);
 	CallNotifyFuncNode->FunctionReference.SetExternalMember(FuncName, UEventSystemBPLibrary::StaticClass());
 	CallNotifyFuncNode->AllocateDefaultPins();
+
+	CompilerContext.MovePinLinksToIntermediate(*EventExec, *CallNotifyFuncNode->GetExecPin()).CanSafeConnect();
+	UEdGraphPin* CallMessageIdPin = CallNotifyFuncNode->FindPinChecked(TEXT("MessageId"));
+	CompilerContext.MovePinLinksToIntermediate(*MsgPin, *CallMessageIdPin);
+
+	UEdGraphPin* CallSenderPin = CallNotifyFuncNode->FindPinChecked(TEXT("Sender"));
+	CompilerContext.MovePinLinksToIntermediate(*SenderPin, *CallSenderPin);
+
+	for (int32 ArgIdx = 0; ArgIdx < PinNames.Num(); ++ArgIdx)
+	{
+		UEdGraphPin* ParameterPin = FindPin(PinNames[ArgIdx]);
+		if (ParameterPin)
+		{
+			auto InputPin = CallNotifyFuncNode->CreatePin(EGPD_Input, ParameterPin->PinType, ParameterPin->PinName);
+			CompilerContext.MovePinLinksToIntermediate(*ParameterPin, *InputPin);
+		}
+	}
+	SpawnNode->BreakAllNodeLinks();
 }
 
 FString UEventsK2Node_EventBase::MessageParamPrefix = TEXT("Param");
 
 void UEventsK2Node_EventBase::AllocateDefaultPins()
 {
-	CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Then);
+	CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Execute);
 	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Then);
 	CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Object, UEdGraphSchema_K2::PSC_Self, UEdGraphSchema_K2::PN_Self);
 	CreateSelectionPin();
@@ -149,6 +173,46 @@ void UEventsK2Node_EventBase::GetMenuActions(FBlueprintActionDatabaseRegistrar& 
 	}
 }
 
+void UEventsK2Node_EventBase::RewireOldPinsToNewPins(TArray<UEdGraphPin*>& InOldPins, TArray<UEdGraphPin*>& InNewPins)
+{
+	DECLARE_SCOPE_HIERARCHICAL_COUNTER_FUNC()
+	// @TODO: we should account for redirectors, orphaning etc. here too!
+
+	for (UEdGraphPin* OldPin : InOldPins)
+	{
+		for (UEdGraphPin* NewPin : InNewPins)
+		{
+			if (OldPin->PinName == NewPin->PinName && OldPin->PinType == NewPin->PinType && OldPin->Direction == NewPin->Direction)
+			{
+				NewPin->MovePersistentDataFromOldPin(*OldPin);
+				break;
+			}
+		}
+	}
+
+	DestroyPinList(InOldPins);
+}
+
+void UEventsK2Node_EventBase::DestroyPinList(TArray<UEdGraphPin*>& InPins)
+{
+	DECLARE_SCOPE_HIERARCHICAL_COUNTER_FUNC()
+
+	UBlueprint* Blueprint = GetBlueprint();
+	bool bNotify = false;
+	if (Blueprint != nullptr)
+	{
+		bNotify = !Blueprint->bIsRegeneratingOnLoad;
+	}
+
+	// Throw away the original pins
+	for (UEdGraphPin* Pin : InPins)
+	{
+		Pin->BreakAllPinLinks(bNotify);
+
+		UEdGraphNode::DestroyPin(Pin);
+	}
+}
+
 void UEventsK2Node_EventBase::CreateSelectionPin()
 {
 	const UEdGraphSchema_K2* K2Schema = GetDefault<UEdGraphSchema_K2>();
@@ -161,7 +225,27 @@ UEdGraphPin* UEventsK2Node_EventBase::GetEventPin() const
 	return FindPin(EventPinName);
 }
 
+UEdGraphPin* UEventsK2Node_EventBase::GetSenderPin() const
+{
+	return FindPin(UEdGraphSchema_K2::PN_Self);
+}
+
 FName UEventsK2Node_EventBase::GetEventPinName()
 {
 	return EventPinName;
+}
+
+FName UEventsK2Node_EventBase::GetUniquePinName()
+{
+	FName NewPinName;
+	int32 i = 0;
+	while (true)
+	{
+		NewPinName = *FString::Printf(TEXT("%s%d"), *UEventsK2Node_EventBase::MessageParamPrefix,i++); *FString::FromInt(i++);
+		if (!FindPin(NewPinName))
+		{
+			break;
+		}
+	}
+	return NewPinName;
 }

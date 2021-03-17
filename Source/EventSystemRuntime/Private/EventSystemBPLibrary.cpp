@@ -230,12 +230,31 @@ bool UEventSystemBPLibrary::GetPinTypeFromStr(const FString& PinTypeStr, FEdGrap
 }
 
 
-void UEventSystemBPLibrary::NotifyMessageByKeyVariadic(const FString& MessageId, UObject* Sender, uint8 Type /*= 0*/)
+void UEventSystemBPLibrary::NotifyMessageByKeyVariadic(const FString& MessageId, UObject* Sender)
 {
 
 }
 
 DEFINE_FUNCTION(UEventSystemBPLibrary::execNotifyMessageByKeyVariadic)
 {
-	
+	P_GET_PROPERTY(FStrProperty, MessageId);
+	P_GET_OBJECT(UObject, Sender);
+
+
+	//FMessageBody::MessageArray Params;
+	while (Stack.PeekCode() != EX_EndFunctionParms)
+	{
+		Stack.MostRecentPropertyAddress = nullptr;
+		Stack.MostRecentProperty = nullptr;
+		Stack.StepCompiledIn<FProperty>(nullptr);
+#if WITH_EDITOR
+		ensureAlways(Stack.MostRecentProperty && Stack.MostRecentPropertyAddress);
+#endif
+
+	}
+	P_FINISH
+
+		P_NATIVE_BEGIN
+		//GMPBLibNotifyMessage(MessageId, Sender, Params, Type, Mgr);
+	P_NATIVE_END
 }

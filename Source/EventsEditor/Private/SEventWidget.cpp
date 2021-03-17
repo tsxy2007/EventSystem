@@ -686,7 +686,7 @@ ECheckBoxState SEventWidget::IsTagChecked(TSharedPtr<FEventNode> Node) const
 		for (int32 ContainerIdx = 0; ContainerIdx < TagContainers.Num(); ++ContainerIdx)
 		{
 			FEventContainer* Container = TagContainers[ContainerIdx].TagContainer;
-			if (Container)
+			if (Container&&Container->IsValid())
 			{
 				NumValidAssets++;
 				FEventInfo Event = Node->GetCompleteTag();

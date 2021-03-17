@@ -8,9 +8,13 @@
 #include "EdGraph/EdGraphPin.h"
 #include "K2Node_Switch.h"
 #include "EventsRuntime/Classes/EventContainer.h"
+#include "Stats/StatsHierarchical.h"
 #include "EventsK2Node_EventBase.generated.h"
 
 class FBlueprintActionDatabaseRegistrar;
+
+#define DECLARE_SCOPE_HIERARCHICAL_COUNTER_RIGUNIT() \
+	DECLARE_SCOPE_HIERARCHICAL_COUNTER_FUNC()
 
 UCLASS()
 class UEventsK2Node_EventBase : public UK2Node
@@ -44,12 +48,16 @@ class UEventsK2Node_EventBase : public UK2Node
 	virtual void GetMenuActions(FBlueprintActionDatabaseRegistrar& ActionRegistrar) const override;
 	// End of UK2Node interface
 
+	virtual void RewireOldPinsToNewPins(TArray<UEdGraphPin*>& InOldPins, TArray<UEdGraphPin*>& InNewPins);
+
+	void DestroyPinList(TArray<UEdGraphPin*>& InPins);
 
 	void CreateSelectionPin();
 
 private:
 	UEdGraphPin* GetEventPin() const;
+	UEdGraphPin* GetSenderPin() const;
 	static FName GetEventPinName();
-
+	FName GetUniquePinName();
 public:
 };
