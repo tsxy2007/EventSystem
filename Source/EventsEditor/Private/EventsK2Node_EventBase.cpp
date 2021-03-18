@@ -108,6 +108,7 @@ void UEventsK2Node_EventBase::ExpandNode(class FKismetCompilerContext& CompilerC
 	UEdGraphPin* EventExec = GetExecPin();
 	UEdGraphPin* MsgPin = GetEventPin();
 	UEdGraphPin* SenderPin = GetSenderPin();
+	UEdGraphPin* ThenPin = FindPinChecked(UEdGraphSchema_K2::PN_Then);
 
 
 	UK2Node_CallFunction* CallNotifyFuncNode = CompilerContext.SpawnIntermediateNode<UK2Node_CallFunction>(SpawnNode, SourceGraph);
@@ -120,6 +121,9 @@ void UEventsK2Node_EventBase::ExpandNode(class FKismetCompilerContext& CompilerC
 
 	UEdGraphPin* CallSenderPin = CallNotifyFuncNode->FindPinChecked(TEXT("Sender"));
 	CompilerContext.MovePinLinksToIntermediate(*SenderPin, *CallSenderPin);
+
+	UEdGraphPin* CallThenPin = CallNotifyFuncNode->FindPinChecked(UEdGraphSchema_K2::PN_Then);
+	CompilerContext.MovePinLinksToIntermediate(*ThenPin, *CallThenPin);
 
 	for (int32 ArgIdx = 0; ArgIdx < PinNames.Num(); ++ArgIdx)
 	{
@@ -241,7 +245,7 @@ FName UEventsK2Node_EventBase::GetUniquePinName()
 	int32 i = 0;
 	while (true)
 	{
-		NewPinName = *FString::Printf(TEXT("%s%d"), *UEventsK2Node_EventBase::MessageParamPrefix,i++); *FString::FromInt(i++);
+		NewPinName = *FString::Printf(TEXT("%s%d"), *UEventsK2Node_EventBase::MessageParamPrefix,i++);
 		if (!FindPin(NewPinName))
 		{
 			break;
