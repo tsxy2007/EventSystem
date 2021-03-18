@@ -36,7 +36,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, CustomThunk, meta = (CallableWithoutWorldContext, BlueprintInternalUseOnly = true, HidePin = "Sender", DefaultToSelf = "Sender", AutoCreateRefTerm = "MessageId", Variadic))
-	static void NotifyMessageByKeyVariadic(const FString& MessageId, UObject* Sender);
+	static void NotifyMessageByKeyVariadic(const FString& MessageId, UObject* Sender); 
 	DECLARE_FUNCTION(execNotifyMessageByKeyVariadic);
 
 };

@@ -240,21 +240,26 @@ DEFINE_FUNCTION(UEventSystemBPLibrary::execNotifyMessageByKeyVariadic)
 	P_GET_PROPERTY(FStrProperty, MessageId);
 	P_GET_OBJECT(UObject, Sender);
 
+	struct FPyOutputParam
+	{
+		FProperty* Property = nullptr;
+		uint8* PropAddr = nullptr;
+	};
 
-	//FMessageBody::MessageArray Params;
+	// Read the output values and store them to write to later from the Python context
+	TArray<FPyOutputParam, TInlineAllocator<8>> OutParms;
 	while (Stack.PeekCode() != EX_EndFunctionParms)
 	{
-		Stack.MostRecentPropertyAddress = nullptr;
-		Stack.MostRecentProperty = nullptr;
 		Stack.StepCompiledIn<FProperty>(nullptr);
-#if WITH_EDITOR
-		ensureAlways(Stack.MostRecentProperty && Stack.MostRecentPropertyAddress);
-#endif
+		check(Stack.MostRecentProperty&& Stack.MostRecentPropertyAddress);
+
+		FPyOutputParam& OutParam = OutParms.AddDefaulted_GetRef();
+		OutParam.Property = Stack.MostRecentProperty;
+		OutParam.PropAddr = Stack.MostRecentPropertyAddress;
 
 	}
 	P_FINISH
 
-		P_NATIVE_BEGIN
-		//GMPBLibNotifyMessage(MessageId, Sender, Params, Type, Mgr);
+	P_NATIVE_BEGIN
 	P_NATIVE_END
 }
