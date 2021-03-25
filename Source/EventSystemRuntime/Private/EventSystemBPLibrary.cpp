@@ -279,7 +279,6 @@ DEFINE_FUNCTION(UEventSystemBPLibrary::execNotifyMessageByKeyVariadic)
 	P_FINISH
 
 	P_NATIVE_BEGIN
-		MessageId = TEXT("3");
 	UEventSystemBPLibrary::NotifyEventByKey(MessageId, Sender, OutParms);
 	P_NATIVE_END
 }
