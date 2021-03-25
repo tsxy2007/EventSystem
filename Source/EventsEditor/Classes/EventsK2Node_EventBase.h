@@ -35,28 +35,27 @@ class UEventsK2Node_EventBase : public UK2Node
 	// UObject interface
 	virtual void PostLoad() override;
 	virtual void PinDefaultValueChanged(UEdGraphPin* Pin) override;
-	virtual void ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph) override;
 	// End of UObject interface
 
 	// UEdGraphNode interface
 	virtual FText GetTooltipText() const override;
-	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
+	//virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
 	virtual bool ShouldShowNodeProperties() const override { return true; }
 	// End of UEdGraphNode interface
 
-	// UK2Node interface
 	virtual void GetMenuActions(FBlueprintActionDatabaseRegistrar& ActionRegistrar) const override;
-	// End of UK2Node interface
-
 	virtual void RewireOldPinsToNewPins(TArray<UEdGraphPin*>& InOldPins, TArray<UEdGraphPin*>& InNewPins);
 
 	void DestroyPinList(TArray<UEdGraphPin*>& InPins);
 
 	void CreateSelectionPin();
 
-private:
+	virtual void AddInnerPin(FName PinName, const FEdGraphPinType& PinType) {};
+
+protected:
 	UEdGraphPin* GetEventPin() const;
-	UEdGraphPin* GetSenderPin() const;
+	UEdGraphPin* GetSelfPin() const;
+	UEdGraphPin* GetThenPin() const;
 	static FName GetEventPinName();
 	FName GetUniquePinName();
 public:

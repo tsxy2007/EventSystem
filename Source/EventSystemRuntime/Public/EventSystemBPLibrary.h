@@ -39,4 +39,9 @@ public:
 	static void NotifyMessageByKeyVariadic(const FString& MessageId, UObject* Sender); 
 	DECLARE_FUNCTION(execNotifyMessageByKeyVariadic);
 
+
+
+	UFUNCTION(BlueprintCallable, meta = (CallableWithoutWorldContext, BlueprintInternalUseOnly = true, HidePin = "Listener", DefaultToSelf = "Listener", AutoCreateRefTerm = "MessageId", Variadic))
+	static void ListenMessageByKey(const FString& MessageId, UObject* Listener,FName EventName);
+
 };

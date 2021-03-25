@@ -235,6 +235,18 @@ void UEventSystemBPLibrary::NotifyMessageByKeyVariadic(const FString& MessageId,
 
 }
 
+void UEventSystemBPLibrary::ListenMessageByKey(const FString& MessageId, UObject* Listener, FName EventName)
+{
+
+	int32 i = 0;
+
+	UFunction* Function = Listener->FindFunction(EventName);
+	if (Function && Function->IsValidLowLevel())
+	{
+		Listener->ProcessEvent(Function, nullptr);
+	}
+}
+
 DEFINE_FUNCTION(UEventSystemBPLibrary::execNotifyMessageByKeyVariadic)
 {
 	P_GET_PROPERTY(FStrProperty, MessageId);
