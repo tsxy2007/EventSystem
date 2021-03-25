@@ -188,7 +188,7 @@ FName UEventsK2Node_EventBase::GetUniquePinName()
 	int32 i = 0;
 	while (true)
 	{
-		NewPinName = *FString::Printf(TEXT("%s%d"), *UEventsK2Node_EventBase::MessageParamPrefix,i++); *FString::FromInt(i++);
+		NewPinName = *FString::Printf(TEXT("%s%d"), *UEventsK2Node_EventBase::MessageParamPrefix,i++); 
 		if (!FindPin(NewPinName))
 		{
 			break;

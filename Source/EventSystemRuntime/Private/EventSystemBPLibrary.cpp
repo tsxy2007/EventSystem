@@ -4,6 +4,9 @@
 #include "EdGraphSchema_K2.h"
 #include "Engine/UserDefinedEnum.h"
 #include "JsonUtilities/Public/JsonObjectConverter.h"
+#include "GIEventSubsystem.h"
+#include "Engine/GameInstance.h"
+
 extern ENGINE_API FString GetPathPostfix(const UObject* ForObject);
 UEventSystemBPLibrary::UEventSystemBPLibrary(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
@@ -237,13 +240,20 @@ void UEventSystemBPLibrary::NotifyMessageByKeyVariadic(const FString& MessageId,
 
 void UEventSystemBPLibrary::ListenMessageByKey(const FString& MessageId, UObject* Listener, FName EventName)
 {
-
-	int32 i = 0;
-
-	UFunction* Function = Listener->FindFunction(EventName);
-	if (Function && Function->IsValidLowLevel())
+	UGIEventSubsystem* System = UGIEventSubsystem::Get(Listener);
+	if (System)
 	{
-		Listener->ProcessEvent(Function, nullptr);
+		System->ListenMessage(MessageId, Listener, EventName);
+	}
+}
+
+
+void UEventSystemBPLibrary::NotifyEventByKey(const FString& EventId, UObject* Sender, const TArray<FPyOutputParam, TInlineAllocator<8>>& Outparames)
+{
+	UGIEventSubsystem* System = UGIEventSubsystem::Get(Sender);
+	if (System)
+	{
+		System->NotifyMessage(EventId, Sender, Outparames);
 	}
 }
 
@@ -252,11 +262,7 @@ DEFINE_FUNCTION(UEventSystemBPLibrary::execNotifyMessageByKeyVariadic)
 	P_GET_PROPERTY(FStrProperty, MessageId);
 	P_GET_OBJECT(UObject, Sender);
 
-	struct FPyOutputParam
-	{
-		FProperty* Property = nullptr;
-		uint8* PropAddr = nullptr;
-	};
+	
 
 	// Read the output values and store them to write to later from the Python context
 	TArray<FPyOutputParam, TInlineAllocator<8>> OutParms;
@@ -273,5 +279,8 @@ DEFINE_FUNCTION(UEventSystemBPLibrary::execNotifyMessageByKeyVariadic)
 	P_FINISH
 
 	P_NATIVE_BEGIN
+		MessageId = TEXT("3");
+	UEventSystemBPLibrary::NotifyEventByKey(MessageId, Sender, OutParms);
 	P_NATIVE_END
 }
+
