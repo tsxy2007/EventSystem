@@ -24,24 +24,21 @@ void UGIEventSubsystem::NotifyMessage(const FString& EventId, UObject* Sender, c
 			UFunction* Function = Listen.Listener->FindFunction(Listen.EventName);
 			if (Function)
 			{
-				auto p = FMemory_Alloca(Function->ParmsSize);
-				FMemory::Memzero(p, Function->ParmsSize);
-
-				bool bSucc = true;
+				auto Params = FMemory_Alloca(Function->ParmsSize);
+				FMemory::Memzero(Params, Function->ParmsSize);
 				int32 Index = 0;
 				for (TFieldIterator<FProperty> It(Function); It && It->HasAnyPropertyFlags(CPF_Parm); ++It)
 				{
 					if (It->HasAnyPropertyFlags(CPF_ReturnParm))
 					{
-						bSucc = false;
 						break;
 					}
 					FProperty* Prop = *It;
 
-					Prop->CopyCompleteValue(Prop->ContainerPtrToValuePtr<void>(p), Outparames[Index].PropAddr);
+					Prop->CopyCompleteValue(Prop->ContainerPtrToValuePtr<void>(Params), Outparames[Index].PropAddr);
 					++Index;
 				}
-				Listen.Listener->ProcessEvent(Function, p);
+				Listen.Listener->ProcessEvent(Function, Params);
 			}
 		}
 	}

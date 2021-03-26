@@ -24,8 +24,7 @@ class UEventsK2Node_ListenEvent : public UEventsK2Node_EventBase
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
 	// End of UEdGraphNode interface
 	virtual void ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph) override;
-
-
+	virtual UEdGraphPin* CreatePinFromUserDefinition(const TSharedPtr<FUserPinInfo> NewPinInfo) override;
 	virtual void AddInnerPin(FName PinName, const FEdGraphPinType& PinType) override;
 protected:
 	UEdGraphPin* GetOutMessagePin() const;

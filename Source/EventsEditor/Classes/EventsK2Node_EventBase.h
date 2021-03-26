@@ -9,9 +9,11 @@
 #include "K2Node_Switch.h"
 #include "EventsRuntime/Classes/EventContainer.h"
 #include "Stats/StatsHierarchical.h"
+#include "K2Node_EditablePinBase.h"
 #include "EventsK2Node_EventBase.generated.h"
 
 class FBlueprintActionDatabaseRegistrar;
+
 
 #define DECLARE_SCOPE_HIERARCHICAL_COUNTER_RIGUNIT() \
 	DECLARE_SCOPE_HIERARCHICAL_COUNTER_FUNC()
@@ -24,8 +26,7 @@ class UEventsK2Node_EventBase : public UK2Node
 	UPROPERTY(EditAnywhere, Category = PinOptions)
 	TArray<FEventInfo> PinTags;
 
-	//UPROPERTY(EditAnywhere, Category = PinOptions)
-	//bool UseInputsOnGraph;
+	TArray< TSharedPtr<FUserPinInfo> >UserDefinedPins;
 
 	UPROPERTY()
 	TArray<FName> PinNames;
@@ -49,9 +50,15 @@ class UEventsK2Node_EventBase : public UK2Node
 	void DestroyPinList(TArray<UEdGraphPin*>& InPins);
 
 	void CreateSelectionPin();
-
+	virtual UEdGraphPin* CreatePinFromUserDefinition(const TSharedPtr<FUserPinInfo> NewPinInfo) { return nullptr; }
 	virtual void AddInnerPin(FName PinName, const FEdGraphPinType& PinType) {};
+	UEdGraphPin* CreateUserDefinedPin(const FName InPinName, const FEdGraphPinType& InPinType, EEdGraphPinDirection InDesiredDirection = EEdGraphPinDirection::EGPD_Input);
 
+	//~ Begin UObject interface
+	virtual void Serialize(FArchive& Ar) override;
+	//~ End UObject interface
+
+	friend FArchive& operator <<(FArchive& Ar, FUserPinInfo& Info);
 protected:
 	UEdGraphPin* GetEventPin() const;
 	UEdGraphPin* GetSelfPin() const;

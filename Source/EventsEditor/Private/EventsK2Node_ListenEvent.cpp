@@ -20,9 +20,14 @@ UEventsK2Node_ListenEvent::UEventsK2Node_ListenEvent(const FObjectInitializer& O
 	OrphanedPinSaveMode = ESaveOrphanPinMode::SaveNone;
 }
 
+UEdGraphPin* UEventsK2Node_ListenEvent::CreatePinFromUserDefinition(const TSharedPtr<FUserPinInfo> NewPinInfo)
+{
+	return CreatePin(NewPinInfo->DesiredPinDirection, NewPinInfo->PinType, NewPinInfo->PinName);
+}
+
 void UEventsK2Node_ListenEvent::AddInnerPin(FName PinName, const FEdGraphPinType& PinType)
 {
-	CreatePin(EGPD_Output, PinType, PinName);
+	CreateUserDefinedPin(PinName, PinType, EEdGraphPinDirection::EGPD_Output);
 }
 
 UEdGraphPin* UEventsK2Node_ListenEvent::GetOutMessagePin() const

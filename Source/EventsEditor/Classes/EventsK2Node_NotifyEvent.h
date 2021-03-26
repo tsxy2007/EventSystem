@@ -11,6 +11,7 @@
 #include "Stats/StatsHierarchical.h"
 #include "EventsK2Node_NotifyEvent.generated.h"
 
+
 UCLASS()
 class UEventsK2Node_NotifyEvent : public UEventsK2Node_EventBase
 {
@@ -27,6 +28,7 @@ class UEventsK2Node_NotifyEvent : public UEventsK2Node_EventBase
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
 	// End of UEdGraphNode interface
 
+	virtual UEdGraphPin* CreatePinFromUserDefinition(const TSharedPtr<FUserPinInfo> NewPinInfo) override;
 	virtual void AddInnerPin(FName PinName, const FEdGraphPinType& PinType) override;
 public:
 };
