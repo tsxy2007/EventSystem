@@ -12,12 +12,65 @@
 #include "KismetCompilerMisc.h"
 #include "KismetCompiler.h"
 #include "K2Node_EditablePinBase.h"
+#include "UObject/FrameworkObjectVersion.h"
 
 namespace
 {
 	static FName DefaultPinName(TEXT("Default"));
 	static FName EventPinName(TEXT("CustomEvent"));
 	static FName SenderPinName(TEXT("Sernder"));
+}
+
+
+
+FArchive& operator<<(FArchive& Ar, FUserPinInfo& Info)
+{
+	Ar.UsingCustomVersion(FFrameworkObjectVersion::GUID);
+
+	if (Ar.CustomVer(FFrameworkObjectVersion::GUID) >= FFrameworkObjectVersion::PinsStoreFName)
+	{
+		Ar << Info.PinName;
+	}
+	else
+	{
+		FString PinNameStr;
+		Ar << PinNameStr;
+		Info.PinName = *PinNameStr;
+	}
+
+	if (Ar.UE4Ver() >= VER_UE4_SERIALIZE_PINTYPE_CONST)
+	{
+		Info.PinType.Serialize(Ar);
+		Ar << Info.DesiredPinDirection;
+	}
+	else
+	{
+		check(Ar.IsLoading());
+
+		bool bIsArray = (Info.PinType.ContainerType == EPinContainerType::Array);
+		Ar << bIsArray;
+
+		bool bIsReference = Info.PinType.bIsReference;
+		Ar << bIsReference;
+
+		Info.PinType.ContainerType = (bIsArray ? EPinContainerType::Array : EPinContainerType::None);
+		Info.PinType.bIsReference = bIsReference;
+
+		FString PinCategoryStr;
+		FString PinSubCategoryStr;
+
+		Ar << PinCategoryStr;
+		Ar << PinSubCategoryStr;
+
+		Info.PinType.PinCategory = *PinCategoryStr;
+		Info.PinType.PinSubCategory = *PinSubCategoryStr;
+
+		Ar << Info.PinType.PinSubCategoryObject;
+	}
+
+	Ar << Info.PinDefaultValue;
+
+	return Ar;
 }
 
 
@@ -50,6 +103,7 @@ void UEventsK2Node_EventBase::PinDefaultValueChanged(UEdGraphPin* Pin)
 			{
 				RemovedPins.Add(Pins[PinIdx]);
 				PinNames.Remove(Pins[PinIdx]->PinName);
+				RemoveUserDefinedPinByName(Pins[PinIdx]->PinName);
 				Pins.RemoveAt(PinIdx);
 			}
 		}
@@ -92,6 +146,14 @@ void UEventsK2Node_EventBase::AllocateDefaultPins()
 	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Then);
 	CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Object, UEdGraphSchema_K2::PSC_Self, UEdGraphSchema_K2::PN_Self);
 	CreateSelectionPin();
+
+	for (int32 i = 0; i < UserDefinedPins.Num(); i++)
+	{
+		if (!FindPin(UserDefinedPins[i]->PinName))
+		{
+			CreatePinFromUserDefinition(UserDefinedPins[i]);
+		}
+	}
 }
 
 FText UEventsK2Node_EventBase::GetTooltipText() const
@@ -177,14 +239,25 @@ UEdGraphPin* UEventsK2Node_EventBase::CreateUserDefinedPin(const FName InPinName
 	return NewPin;
 }
 
+void UEventsK2Node_EventBase::RemoveUserDefinedPinByName(const FName PinName)
+{
+	// Remove the description from the user-defined pins array
+	UserDefinedPins.RemoveAll([&](const TSharedPtr<FUserPinInfo>& UDPin)
+		{
+			return UDPin.IsValid() && (UDPin->PinName == PinName);
+		});
+}
+
 void UEventsK2Node_EventBase::Serialize(FArchive& Ar)
 {
 
 	// Do not call parent, but call grandparent
 	Super::Serialize(Ar);
-	// Pins Serialization 
-	TArray<FUserPinInfo> SerializedItems;
+	
 
+	Ar.UsingCustomVersion(FFrameworkObjectVersion::GUID);
+
+	TArray<FUserPinInfo> SerializedItems;
 	if (Ar.IsLoading())
 	{
 		Ar << SerializedItems;
@@ -192,42 +265,9 @@ void UEventsK2Node_EventBase::Serialize(FArchive& Ar)
 		const UEdGraphSchema_K2* K2Schema = GetDefault<UEdGraphSchema_K2>();
 
 		UserDefinedPins.Empty(SerializedItems.Num());
-
 		for (int32 Index = 0; Index < SerializedItems.Num(); ++Index)
 		{
 			TSharedPtr<FUserPinInfo> PinInfo = MakeShareable(new FUserPinInfo(SerializedItems[Index]));
-
-			//const bool bValidateConstRefPinTypes = Ar.CustomVer(FFrameworkObjectVersion::GUID) < FFrameworkObjectVersion::EditableEventsUseConstRefParameters
-			//	&& ShouldUseConstRefParams();
-			//{
-			//	if (UEdGraphPin* NodePin = FindPin(PinInfo->PinName))
-			//	{
-			//		{
-			//			// NOTE: the second FindPin call here to keep us from altering a pin with the same 
-			//			//       name but different direction (in case there is two)
-			//			if (PinInfo->DesiredPinDirection != NodePin->Direction && FindPin(PinInfo->PinName, PinInfo->DesiredPinDirection) == nullptr)
-			//			{
-			//				PinInfo->DesiredPinDirection = NodePin->Direction;
-			//			}
-			//		}
-
-			//		if (bValidateConstRefPinTypes)
-			//		{
-			//			// Note that we should only get here if ShouldUseConstRefParams() indicated this node represents an event function with no outputs (above).
-			//			if (!NodePin->PinType.bIsConst
-			//				&& NodePin->Direction == EGPD_Output
-			//				&& !K2Schema->IsExecPin(*NodePin)
-			//				&& !K2Schema->IsDelegateCategory(NodePin->PinType.PinCategory))
-			//			{
-			//				// Add 'const' to either an array pin type (always passed by reference) or a pin type that's explicitly flagged to be passed by reference.
-			//				NodePin->PinType.bIsConst = NodePin->PinType.IsArray() || NodePin->PinType.bIsReference;
-
-			//				// Also mirror the flag into the UserDefinedPins array.
-			//				PinInfo->PinType.bIsConst = NodePin->PinType.bIsConst;
-			//			}
-			//		}
-			//	}
-			//}
 
 			UserDefinedPins.Add(PinInfo);
 		}
@@ -236,17 +276,15 @@ void UEventsK2Node_EventBase::Serialize(FArchive& Ar)
 	{
 		SerializedItems.Empty(UserDefinedPins.Num());
 
-		for (int32 PinsIndex = 0; PinsIndex < UserDefinedPins.Num(); ++PinsIndex)
+		for (int32 Index = 0; Index < UserDefinedPins.Num(); ++Index)
 		{
-			SerializedItems.Add(*(UserDefinedPins[PinsIndex].Get()));
+			SerializedItems.Add(*(UserDefinedPins[Index].Get()));
 		}
 
 		Ar << SerializedItems;
 	}
 	else
 	{
-		// We want to avoid destroying and recreating FUserPinInfo, because that will invalidate 
-		// any WeakPtrs to those entries:
 		for (TSharedPtr<FUserPinInfo>& PinInfo : UserDefinedPins)
 		{
 			Ar << *PinInfo;

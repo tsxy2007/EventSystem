@@ -53,6 +53,7 @@ class UEventsK2Node_EventBase : public UK2Node
 	virtual UEdGraphPin* CreatePinFromUserDefinition(const TSharedPtr<FUserPinInfo> NewPinInfo) { return nullptr; }
 	virtual void AddInnerPin(FName PinName, const FEdGraphPinType& PinType) {};
 	UEdGraphPin* CreateUserDefinedPin(const FName InPinName, const FEdGraphPinType& InPinType, EEdGraphPinDirection InDesiredDirection = EEdGraphPinDirection::EGPD_Input);
+	void RemoveUserDefinedPinByName(const FName PinName);
 
 	//~ Begin UObject interface
 	virtual void Serialize(FArchive& Ar) override;
