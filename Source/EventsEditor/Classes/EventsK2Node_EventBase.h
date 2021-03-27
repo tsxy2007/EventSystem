@@ -60,6 +60,9 @@ class UEventsK2Node_EventBase : public UK2Node
 	//~ End UObject interface
 
 	friend FArchive& operator <<(FArchive& Ar, FUserPinInfo& Info);
+
+	bool ModifyUserDefinedPinDefaultValue(TSharedPtr<FUserPinInfo> PinInfo, const FString& InDefaultValue);
+	bool UpdateEdGraphPinDefaultValue(TSharedPtr<FUserPinInfo> PinInfo, FString& NewDefaultValue);
 protected:
 	UEdGraphPin* GetEventPin() const;
 	UEdGraphPin* GetSelfPin() const;
