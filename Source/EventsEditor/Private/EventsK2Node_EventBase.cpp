@@ -161,6 +161,7 @@ void UEventsK2Node_EventBase::AllocateDefaultPins()
 	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Then);
 	CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Object, UEdGraphSchema_K2::PSC_Self, UEdGraphSchema_K2::PN_Self);
 	CreateSelectionPin();
+	CreateOutEventPin();
 
 	for (int32 i = 0; i < UserDefinedPins.Num(); i++)
 	{

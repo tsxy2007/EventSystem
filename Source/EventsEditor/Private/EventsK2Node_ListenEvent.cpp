@@ -13,6 +13,10 @@
 #include "K2Node_CustomEvent.h"
 
 
+namespace
+{
+	static FName OutEventPinName(TEXT("OutMessage"));
+}
 
 UEventsK2Node_ListenEvent::UEventsK2Node_ListenEvent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -30,9 +34,14 @@ void UEventsK2Node_ListenEvent::AddInnerPin(FName PinName, const FEdGraphPinType
 	CreateUserDefinedPin(PinName, PinType, EEdGraphPinDirection::EGPD_Output);
 }
 
+void UEventsK2Node_ListenEvent::CreateOutEventPin()
+{
+	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, OutEventPinName);
+}
+
 UEdGraphPin* UEventsK2Node_ListenEvent::GetOutMessagePin() const
 {
-	return FindPinChecked(TEXT("OutMessage"));
+	return FindPinChecked(OutEventPinName);
 }
 
 void UEventsK2Node_ListenEvent::ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph)
@@ -94,7 +103,6 @@ void UEventsK2Node_ListenEvent::ExpandNode(class FKismetCompilerContext& Compile
 void UEventsK2Node_ListenEvent::AllocateDefaultPins()
 {
 	Super::AllocateDefaultPins();
-	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, TEXT("OutMessage"));
 }
 
 FText UEventsK2Node_ListenEvent::GetNodeTitle(ENodeTitleType::Type TitleType) const

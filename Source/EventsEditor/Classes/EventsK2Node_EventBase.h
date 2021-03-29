@@ -50,6 +50,7 @@ class UEventsK2Node_EventBase : public UK2Node
 	void DestroyPinList(TArray<UEdGraphPin*>& InPins);
 
 	void CreateSelectionPin();
+	virtual void CreateOutEventPin() {};
 	virtual UEdGraphPin* CreatePinFromUserDefinition(const TSharedPtr<FUserPinInfo> NewPinInfo) { return nullptr; }
 	virtual void AddInnerPin(FName PinName, const FEdGraphPinType& PinType) {};
 	UEdGraphPin* CreateUserDefinedPin(const FName InPinName, const FEdGraphPinType& InPinType, EEdGraphPinDirection InDesiredDirection = EEdGraphPinDirection::EGPD_Input);
