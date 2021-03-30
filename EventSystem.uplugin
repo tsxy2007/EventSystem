@@ -33,9 +33,9 @@
 		},
 		{
 			"Name": "EventsEditor",
-			"Type": "Editor",
+			"Type": "UncookedOnly",
 			"LoadingPhase": "Default",
-			"WhitelistPlatforms": [
+			"WhitelistPlatforms": [ 
 				"Win64"
 			]
 		}

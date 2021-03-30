@@ -15,7 +15,7 @@
 UCLASS()
 class UEventsK2Node_NotifyEvent : public UEventsK2Node_EventBase
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_UCLASS_BODY() 
 
 
 	virtual void AllocateDefaultPins() override;
