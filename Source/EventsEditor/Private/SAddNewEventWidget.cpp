@@ -258,7 +258,7 @@ FReply SAddNewEventWidget::OnAddNewParameterButtonPressed()
 {
 	static FEdGraphPinType StringType;
 	StringType.PinCategory = UEdGraphSchema_K2::PC_String;
-	FString PinTypeStr = UEventSystemBPLibrary::GetParameterType(StringType);
+	FString PinTypeStr = UESBPLibrary::GetParameterType(StringType);
 	auto& Ref = Add_GetRef(MessageTables, MakeShared<FEventParameterDetail>());
 	Ref->Name = *FString::Printf(TEXT("Param%d"), MessageTables.Num() - 1);
 	Ref->Type = *PinTypeStr;
@@ -373,7 +373,7 @@ TSharedRef<class ITableRow> SAddNewEventWidget::OnGenerateParameterRow(TSharedPt
 				if (InItem->PinType != Type)
 				{
 					InItem->PinType = Type;
-					InItem->Type = FName(*UEventSystemBPLibrary::GetParameterType(Type));
+					InItem->Type = FName(*UESBPLibrary::GetParameterType(Type));
 				}
 				if (ListViewWidget.IsValid())
 				{

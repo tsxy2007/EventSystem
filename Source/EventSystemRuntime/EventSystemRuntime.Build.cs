@@ -41,10 +41,9 @@ public class EventSystemRuntime : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"BlueprintGraph",
 				"DeveloperSettings",
-				"JsonUtilities",
-				"Json",
+                "JsonUtilities",
+                "Json",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

@@ -41,6 +41,8 @@ namespace UnrealBuildTool.Rules
 					"EventSystemRuntime",
 					"BlueprintCompilerCppBackend",
                     "ContentBrowserData",
+                "JsonUtilities",
+                "Json",
                 }
 			);
 

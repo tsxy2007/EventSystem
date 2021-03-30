@@ -120,7 +120,7 @@ void UEventsK2Node_EventBase::PinDefaultValueChanged(UEdGraphPin* Pin)
 			for (auto& ParamterInfo : Node->Parameters)
 			{
 				FEdGraphPinType PinType;
-				if (UEventSystemBPLibrary::GetPinTypeFromStr(ParamterInfo.Type.ToString(), PinType))
+				if (UESBPLibrary::GetPinTypeFromStr(ParamterInfo.Type.ToString(), PinType))
 				{
 					AddInnerPin(*UEventsK2Node_EventBase::MessageParamPrefix, PinType);
 				}

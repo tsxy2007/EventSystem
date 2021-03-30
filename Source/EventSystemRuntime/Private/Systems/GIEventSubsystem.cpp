@@ -2,6 +2,10 @@
 
 
 #include "Systems/GIEventSubsystem.h"
+#include "Engine/World.h"
+#include "Engine/Engine.h"
+#include "Engine/GameInstance.h"
+
 
 void UGIEventSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -54,15 +58,14 @@ UGIEventSubsystem* UGIEventSubsystem::Get(const UObject* WorldContext)
 {
 	if (WorldContext)
 	{
-		UWorld* World = GEngine->GetWorldFromContextObject(WorldContext, EGetWorldErrorMode::ReturnNull);
+		const UWorld* const World = GEngine->GetWorldFromContextObject(WorldContext, EGetWorldErrorMode::LogAndReturnNull);
 		if (World)
 		{
-			UGameInstance* GI = World->GetGameInstance();
-			if (GI)
+			UGIEventSubsystem* System = World->GetGameInstance()->GetSubsystem<UGIEventSubsystem>();
+			if (System)
 			{
-				return UGameInstance::GetSubsystem<UGIEventSubsystem>(GI);
+				return System;
 			}
-			
 		}
 	}
 	return nullptr;

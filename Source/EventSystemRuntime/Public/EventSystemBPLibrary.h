@@ -29,10 +29,6 @@ class EVENTSYSTEMRUNTIME_API UEventSystemBPLibrary : public UBlueprintFunctionLi
 	GENERATED_UCLASS_BODY()
 
 public:
-	static FString GetParameterType(const FEdGraphPinType& Type);
-	static FString GetCppName(FFieldVariant Field, bool bUInterface = false, bool bForceParameterNameModification = false);
-	static int32 GetInheritenceLevel(const UStruct* Struct);
-	static bool GetPinTypeFromStr(const FString& PinTypeStr, FEdGraphPinType& PinType);
 
 	static void NotifyEventByKey(const FString& EventId, UObject* Sender, const TArray<FPyOutputParam, TInlineAllocator<8>>& Outparames);
 public:
