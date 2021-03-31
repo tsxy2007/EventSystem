@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "EventSystemRuntime.h"
-#include "Setting/EventSystemSettings.h"
 
 #define LOCTEXT_NAMESPACE "FEventSystemModule"
 
