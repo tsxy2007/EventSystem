@@ -20,15 +20,21 @@ void UEventSystemBPLibrary::NotifyMessageByKeyVariadic(const FString& MessageId,
 
 }
 
-void UEventSystemBPLibrary::ListenMessageByKey(const FString& MessageId, UObject* Listener, FName EventName)
+FEventHandle UEventSystemBPLibrary::ListenMessageByKey(const FString& MessageId, UObject* Listener, FName EventName)
 {
 	UGIEventSubsystem* System = UGIEventSubsystem::Get(Listener);
 	if (System)
 	{
-		System->ListenMessage(MessageId, Listener, EventName);
+		return System->ListenMessage(MessageId, Listener, EventName);
 	}
+	return FEventHandle();
 }
 
+
+FString UEventSystemBPLibrary::Conv_EventHandleToString(const FEventHandle& InRot)
+{
+	return InRot.ToString();
+}
 
 void UEventSystemBPLibrary::NotifyEventByKey(const FString& EventId, UObject* Sender, const TArray<FPyOutputParam, TInlineAllocator<8>>& Outparames)
 {

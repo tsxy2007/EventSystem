@@ -6,26 +6,6 @@
 #include "Engine/Engine.h"
 #include "Engine/GameInstance.h"
 
-namespace UE4Event_Private
-{
-	TAtomic<uint64> GNextHandle(1);
-}
-
-EVENTSYSTEMRUNTIME_API uint64 FEventHandle::GenerateNewID()
-{
-	// Just increment a counter to generate an ID.
-	uint64 Result = ++UE4Event_Private::GNextHandle;
-
-	// Check for the next-to-impossible event that we wrap round to 0, because we reserve 0 for null delegates.
-	if (Result == 0)
-	{
-		// Increment it again - it might not be zero, so don't just assign it to 1.
-		Result = ++UE4Event_Private::GNextHandle;
-	}
-
-	return Result;
-}
-
 
 void UGIEventSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -44,7 +24,7 @@ void UGIEventSubsystem::NotifyMessage(const FString& EventId, UObject* Sender, c
 	{
 		return;
 	}
-	TArray<FListener> & Listeners = ListenerMap.FindChecked(EventId);
+	TSet<FEventHandle> & Listeners = ListenerMap.FindChecked(EventId);
 	for (const auto& Listen :Listeners)
 	{
 		if (Listen.Listener)
@@ -75,19 +55,13 @@ void UGIEventSubsystem::NotifyMessage(const FString& EventId, UObject* Sender, c
 const FEventHandle UGIEventSubsystem::ListenMessage(const FString& MessageId, UObject* Listener, FName EventName)
 {
 	FName MsgID = FName (*MessageId);
-	FListener Lis(Listener, EventName, MsgID);
-	TArray<FListener>& Listeners = ListenerMap.FindOrAdd(MessageId);
-	for (auto& TmpListener : Listeners)
+	FEventHandle Lis(Listener, EventName, MsgID);
+	TSet<FEventHandle>& Listeners = ListenerMap.FindOrAdd(MessageId);
+	if (!Listeners.Contains(Lis))
 	{
-		if (TmpListener == Lis)
-		{
-			return TmpListener.Handle();
-		}
+		Listeners.Add(Lis);
 	}
-
-	
-	Listeners.Add(Lis);
-	return Lis.Handle();
+	return Lis;
 }
 
 UGIEventSubsystem* UGIEventSubsystem::Get(const UObject* WorldContext)

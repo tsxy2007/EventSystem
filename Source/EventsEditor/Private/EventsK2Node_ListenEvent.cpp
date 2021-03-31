@@ -16,6 +16,7 @@
 namespace
 {
 	static FName OutEventPinName(TEXT("OutMessage"));
+	static FName OutReturnEventHandleName(TEXT("ReturnEventHandle"));
 }
 
 UEventsK2Node_ListenEvent::UEventsK2Node_ListenEvent(const FObjectInitializer& ObjectInitializer)
@@ -39,9 +40,25 @@ void UEventsK2Node_ListenEvent::CreateOutEventPin()
 	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, OutEventPinName);
 }
 
+void UEventsK2Node_ListenEvent::CreateReturnEventHandlePin()
+{
+	FEdGraphPinType PinType;
+	PinType.ResetToDefaults();
+
+	PinType.PinCategory = UEdGraphSchema_K2::PC_Struct;
+	PinType.PinSubCategoryObject = FEventHandle::StaticStruct();
+
+	CreatePin(EGPD_Output, PinType, OutReturnEventHandleName);
+}
+
 UEdGraphPin* UEventsK2Node_ListenEvent::GetOutMessagePin() const
 {
 	return FindPinChecked(OutEventPinName);
+}
+
+UEdGraphPin* UEventsK2Node_ListenEvent::GetReturnEventHandlePin() const
+{
+	return FindPinChecked(OutReturnEventHandleName);
 }
 
 void UEventsK2Node_ListenEvent::ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph)
@@ -72,6 +89,7 @@ void UEventsK2Node_ListenEvent::ExpandNode(class FKismetCompilerContext& Compile
 	UEdGraphPin* SpawnSelfPin = GetSelfPin();
 	UEdGraphPin* SpawnNodeThen = GetThenPin();
 	UEdGraphPin* SpawnOutMessagePin = GetOutMessagePin();
+	UEdGraphPin* SpawnReturnHandlePin = GetReturnEventHandlePin();
 
 	UK2Node_CallFunction* CallNotifyFuncNode = CompilerContext.SpawnIntermediateNode<UK2Node_CallFunction>(SpawnNode, SourceGraph);
 	CallNotifyFuncNode->FunctionReference.SetExternalMember(FuncName, UEventSystemBPLibrary::StaticClass());
@@ -95,6 +113,9 @@ void UEventsK2Node_ListenEvent::ExpandNode(class FKismetCompilerContext& Compile
 
 	UEdGraphPin* CallOutMessageThen = CustomEventNode->FindPinChecked(UEdGraphSchema_K2::PN_Then);
 	CompilerContext.MovePinLinksToIntermediate(*SpawnOutMessagePin, *CallOutMessageThen);
+
+	UEdGraphPin* CallReturnPin = CallNotifyFuncNode->GetReturnValuePin();
+	CompilerContext.MovePinLinksToIntermediate(*SpawnReturnHandlePin, *CallReturnPin);
 
 	SpawnNode->BreakAllNodeLinks();
 }

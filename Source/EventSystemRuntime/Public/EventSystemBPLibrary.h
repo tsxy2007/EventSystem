@@ -39,6 +39,9 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, meta = (CallableWithoutWorldContext, BlueprintInternalUseOnly = true, HidePin = "Listener", DefaultToSelf = "Listener", AutoCreateRefTerm = "MessageId", Variadic))
-	static void ListenMessageByKey(const FString& MessageId, UObject* Listener,FName EventName);
+	static FEventHandle ListenMessageByKey(const FString& MessageId, UObject* Listener,FName EventName);
 
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "ToString (EventHandle)", CompactNodeTitle = "->", BlueprintAutocast), Category = "Utilities|String")
+	static FString Conv_EventHandleToString(const FEventHandle& InRot);
 };
