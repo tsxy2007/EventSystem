@@ -12,24 +12,102 @@ struct FPyOutputParam
 	uint8* PropAddr = nullptr;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
+struct FEventHandle
+{
+	GENERATED_USTRUCT_BODY();
+public:
+	enum EGenerateNewHandleType
+	{
+		GenerateNewHandle
+	};
+	FEventHandle()
+		: Handle(0)
+	{
+	}
+
+	/** Creates a handle pointing to a new instance */
+	explicit FEventHandle(EGenerateNewHandleType)
+		: Handle(GenerateNewID())
+	{
+	}
+
+	/** Returns true if this was ever bound to a delegate, but you need to check with the owning delegate to confirm it is still valid */
+	bool IsValid() const
+	{
+		return Handle != 0;
+	}
+
+	/** Clear handle to indicate it is no longer bound */
+	void Reset()
+	{
+		Handle = 0;
+	}
+
+	friend uint32 GetTypeHash(const FEventHandle& Key)
+	{
+		return GetTypeHash(Key.Handle);
+	}
+
+	void GenerateHandle()
+	{
+		Handle = GenerateNewID();
+	}
+
+private:
+	friend bool operator==(const FEventHandle& Lhs, const FEventHandle& Rhs)
+	{
+		return Lhs.Handle == Rhs.Handle;
+	}
+
+	friend bool operator!=(const FEventHandle& Lhs, const FEventHandle& Rhs)
+	{
+		return Lhs.Handle != Rhs.Handle;
+	}
+
+private:
+	static EVENTSYSTEMRUNTIME_API uint64 GenerateNewID();
+public:
+	UPROPERTY(Transient)
+	uint64 Handle;
+};
+
+
 struct FListener
 {
-	GENERATED_USTRUCT_BODY()
-	UPROPERTY()
-	UObject* Listener;
-	UPROPERTY()
-	FName EventName;
-
 	FListener() :
-		Listener(nullptr),
-		EventName(TEXT("None"))
+	Listener(nullptr),
+	EventName(TEXT("None")),
+	MsgId(TEXT(""))
 	{};
-	FListener(UObject* InListener,FName InEventName)
-		:Listener(InListener),
-		EventName(InEventName)
+
+	FListener(UObject* InListener,FName InEventName,FName InMsgID)
+		:Listener(InListener), 
+		EventName(InEventName),
+		MsgId(InMsgID)
 	{}
+
+	friend bool operator==(const FListener& Lhs, const FListener& Rhs)
+	{
+		return Lhs.EventName == Rhs.EventName 
+			&& Lhs.Listener == Rhs.Listener;
+	}
+
+	const FEventHandle& Handle() 
+	{
+		if (!mHandle.IsValid())
+		{
+			mHandle.GenerateHandle();
+		}
+		return mHandle;
+	};
+public:
+	FEventHandle mHandle;
+	UObject* Listener;
+	FName EventName;
+	FName MsgId;
 };
+
 /**
  * 
  */
@@ -44,10 +122,10 @@ public:
 	virtual void Deinitialize() override;
 
 	void NotifyMessage(const FString& EventId, UObject* Sender, const TArray<FPyOutputParam, TInlineAllocator<8>>& Outparames);
-	void ListenMessage(const FString& MessageId, UObject* Listener, FName EventName);
+	const FEventHandle ListenMessage(const FString& MessageId, UObject* Listener, FName EventName);
 
 	static UGIEventSubsystem* Get(const UObject* WorldContext);
 
 private:
-	TMultiMap<FString, FListener> ListenerMap;
+	TMap<FString, TArray<FListener>> ListenerMap;
 };

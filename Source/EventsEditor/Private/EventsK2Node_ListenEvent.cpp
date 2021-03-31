@@ -53,7 +53,7 @@ void UEventsK2Node_ListenEvent::ExpandNode(class FKismetCompilerContext& Compile
 	CustomEventNode->CustomFunctionName = *("CustomEventFUNC_" + CompilerContext.GetGuid(CustomEventNode));
 	CustomEventNode->AllocateDefaultPins();
 
-
+	
 	for (int32 ArgIdx = 0; ArgIdx < PinNames.Num(); ++ArgIdx)
 	{
 		UEdGraphPin* ParameterPin = FindPin(PinNames[ArgIdx]);
