@@ -81,7 +81,7 @@ void UEventsK2Node_ListenEvent::ExpandNode(class FKismetCompilerContext& Compile
 		}
 	}
 
-	static const FName FuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, ListenMessageByKey);
+	static const FName FuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, ListenEventByKey);
 
 	UEventsK2Node_ListenEvent* SpawnNode = this;
 	UEdGraphPin* SpawnEventExec = GetExecPin();

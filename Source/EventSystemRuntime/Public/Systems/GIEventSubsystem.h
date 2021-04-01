@@ -50,6 +50,7 @@ public:
 		FString ListenerName = Listener && Listener->IsValidLowLevel() ? Listener->GetName() : TEXT("");
 		return FString::Printf(TEXT("MsgID : %s; EventName: %s; Listener : %s"),*MsgId.ToString(),*EventName.ToString(), *ListenerName);
 	}
+	FName GetMsgId() { return MsgId; }
 public:
 	UObject* Listener;
 	FName EventName;
@@ -71,6 +72,7 @@ public:
 
 	void NotifyMessage(const FString& EventId, UObject* Sender, const TArray<FPyOutputParam, TInlineAllocator<8>>& Outparames);
 	const FEventHandle ListenMessage(const FString& MessageId, UObject* Listener, FName EventName);
+	void UnListenEvent(const FEventHandle& InHandle);
 
 	static UGIEventSubsystem* Get(const UObject* WorldContext);
 

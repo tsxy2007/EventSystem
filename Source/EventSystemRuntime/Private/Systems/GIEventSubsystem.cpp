@@ -24,7 +24,7 @@ void UGIEventSubsystem::NotifyMessage(const FString& EventId, UObject* Sender, c
 	{
 		return;
 	}
-	TSet<FEventHandle> & Listeners = ListenerMap.FindChecked(EventId);
+	TSet<FEventHandle> Listeners = ListenerMap.FindChecked(EventId); 
 	for (const auto& Listen :Listeners)
 	{
 		if (Listen.Listener)
@@ -62,6 +62,20 @@ const FEventHandle UGIEventSubsystem::ListenMessage(const FString& MessageId, UO
 		Listeners.Add(Lis);
 	}
 	return Lis;
+}
+
+void UGIEventSubsystem::UnListenEvent(const FEventHandle& InHandle)
+{
+	FString MsgID = InHandle.MsgId.ToString();
+	if (ListenerMap.Contains(MsgID))
+	{
+		TSet<FEventHandle>& Listeners = ListenerMap.FindChecked(MsgID);
+		Listeners.Remove(InHandle);
+		if (Listeners.Num() == 0)
+		{
+			ListenerMap.Remove(MsgID);
+		}
+	}
 }
 
 UGIEventSubsystem* UGIEventSubsystem::Get(const UObject* WorldContext)

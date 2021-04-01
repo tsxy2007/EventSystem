@@ -20,7 +20,7 @@ void UEventSystemBPLibrary::NotifyMessageByKeyVariadic(const FString& MessageId,
 
 }
 
-FEventHandle UEventSystemBPLibrary::ListenMessageByKey(const FString& MessageId, UObject* Listener, FName EventName)
+FEventHandle UEventSystemBPLibrary::ListenEventByKey(const FString& MessageId, UObject* Listener, FName EventName)
 {
 	UGIEventSubsystem* System = UGIEventSubsystem::Get(Listener);
 	if (System)
@@ -30,6 +30,15 @@ FEventHandle UEventSystemBPLibrary::ListenMessageByKey(const FString& MessageId,
 	return FEventHandle();
 }
 
+
+void UEventSystemBPLibrary::UnListenEvent(const UObject* WorldContext, const FEventHandle& Handle)
+{
+	UGIEventSubsystem* System = UGIEventSubsystem::Get(WorldContext);
+	if (System)
+	{
+		System->UnListenEvent(Handle);
+	}
+}
 
 FString UEventSystemBPLibrary::Conv_EventHandleToString(const FEventHandle& InRot)
 {
