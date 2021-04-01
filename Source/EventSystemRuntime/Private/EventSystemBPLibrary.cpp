@@ -15,7 +15,7 @@ UEventSystemBPLibrary::UEventSystemBPLibrary(const FObjectInitializer& ObjectIni
 
 
 
-void UEventSystemBPLibrary::NotifyMessageByKeyVariadic(const FString& MessageId, UObject* Sender)
+void UEventSystemBPLibrary::NotifyEventByKeyVariadic(const FString& MessageId, UObject* Sender)
 {
 
 }
@@ -25,7 +25,7 @@ FEventHandle UEventSystemBPLibrary::ListenEventByKey(const FString& MessageId, U
 	UGIEventSubsystem* System = UGIEventSubsystem::Get(Listener);
 	if (System)
 	{
-		return System->ListenMessage(MessageId, Listener, EventName);
+		return System->ListenEvent(MessageId, Listener, EventName);
 	}
 	return FEventHandle();
 }
@@ -50,16 +50,14 @@ void UEventSystemBPLibrary::NotifyEventByKey(const FString& EventId, UObject* Se
 	UGIEventSubsystem* System = UGIEventSubsystem::Get(Sender);
 	if (System)
 	{
-		System->NotifyMessage(EventId, Sender, Outparames);
+		System->NotifyEvent(EventId, Sender, Outparames);
 	}
 }
 
-DEFINE_FUNCTION(UEventSystemBPLibrary::execNotifyMessageByKeyVariadic)
+DEFINE_FUNCTION(UEventSystemBPLibrary::execNotifyEventByKeyVariadic)
 {
 	P_GET_PROPERTY(FStrProperty, MessageId);
 	P_GET_OBJECT(UObject, Sender);
-
-	
 
 	// Read the output values and store them to write to later from the Python context
 	TArray<FPyOutputParam, TInlineAllocator<8>> OutParms;

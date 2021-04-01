@@ -70,8 +70,8 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
-	void NotifyMessage(const FString& EventId, UObject* Sender, const TArray<FPyOutputParam, TInlineAllocator<8>>& Outparames);
-	const FEventHandle ListenMessage(const FString& MessageId, UObject* Listener, FName EventName);
+	void NotifyEvent(const FString& EventId, UObject* Sender, const TArray<FPyOutputParam, TInlineAllocator<8>>& Outparames);
+	const FEventHandle ListenEvent(const FString& MessageId, UObject* Listener, FName EventName);
 	void UnListenEvent(const FEventHandle& InHandle);
 
 	static UGIEventSubsystem* Get(const UObject* WorldContext);

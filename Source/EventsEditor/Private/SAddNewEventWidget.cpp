@@ -9,9 +9,9 @@
 #include "Misc/MessageDialog.h"
 #include "PropertyCustomizationHelpers.h"
 #include "SPinTypeSelector.h"
-#include "UnrealCompatibility.h"
 #include "EventSystemBPLibrary.h"
 #include "BlueprintCompilerCppBackend/Private/BlueprintCompilerCppBackendUtils.h"
+#include "UnrealCompatibility.h"
 
 #define LOCTEXT_NAMESPACE "AddNewEventWidget"
 

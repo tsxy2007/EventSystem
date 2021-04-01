@@ -17,7 +17,7 @@ void UGIEventSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-void UGIEventSubsystem::NotifyMessage(const FString& EventId, UObject* Sender, const TArray<FPyOutputParam, TInlineAllocator<8>>& Outparames)
+void UGIEventSubsystem::NotifyEvent(const FString& EventId, UObject* Sender, const TArray<FPyOutputParam, TInlineAllocator<8>>& Outparames)
 {
 	bool bCanNotify = ListenerMap.Contains(EventId);
 	if (!bCanNotify)
@@ -52,7 +52,7 @@ void UGIEventSubsystem::NotifyMessage(const FString& EventId, UObject* Sender, c
 	}
 }
 
-const FEventHandle UGIEventSubsystem::ListenMessage(const FString& MessageId, UObject* Listener, FName EventName)
+const FEventHandle UGIEventSubsystem::ListenEvent(const FString& MessageId, UObject* Listener, FName EventName)
 {
 	FName MsgID = FName (*MessageId);
 	FEventHandle Lis(Listener, EventName, MsgID);

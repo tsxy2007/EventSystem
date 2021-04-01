@@ -35,7 +35,7 @@ void UEventsK2Node_NotifyEvent::AddInnerPin(FName PinName, const FEdGraphPinType
 void UEventsK2Node_NotifyEvent::ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph)
 {
 	Super::ExpandNode(CompilerContext, SourceGraph);
-	static const FName FuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, NotifyMessageByKeyVariadic);
+	static const FName FuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, NotifyEventByKeyVariadic);
 
 	UEventsK2Node_NotifyEvent* SpawnNode = this;
 	UEdGraphPin* SpawnEventExec = GetExecPin();
