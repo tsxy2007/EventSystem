@@ -2,6 +2,7 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.0",
+	"EngineVersion": "4.26",
 	"FriendlyName": "EventSystem",
 	"Description": "",
 	"Category": "Other",
@@ -35,7 +36,7 @@
 			"Name": "EventsEditor",
 			"Type": "UncookedOnly",
 			"LoadingPhase": "Default",
-			"WhitelistPlatforms": [ 
+			"WhitelistPlatforms": [
 				"Win64"
 			]
 		}
