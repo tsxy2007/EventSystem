@@ -1,3 +1,5 @@
+// Copyright 2019 - 2021, butterfly, Event System Plugin, All Rights Reserved.
+
 #pragma once
 
 #if !defined(UNREAL_COMPATIBILITY_GUARD_H)

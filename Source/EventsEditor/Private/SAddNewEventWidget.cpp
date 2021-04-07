@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright 2019 - 2021, butterfly, Event System Plugin, All Rights Reserved.
 
 #include "SAddNewEventWidget.h"
 #include "DetailLayoutBuilder.h"

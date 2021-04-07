@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2019 - 2021, butterfly, Event System Plugin, All Rights Reserved.
 
 #pragma once
 
