@@ -62,7 +62,7 @@ void FEventReferenceHelperDetails::CustomizeHeader( TSharedRef<IPropertyHandle> 
 			TArray<FAssetIdentifier> Referencers;
 
 			FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
-			AssetRegistryModule.Get().GetReferencers(TagId, Referencers, EAssetRegistryDependencyType::SearchableName);
+			AssetRegistryModule.Get().GetReferencers(TagId, Referencers, UE::AssetRegistry::EDependencyCategory::SearchableName);
 
 			for (FAssetIdentifier& AssetIdentifier : Referencers)
 			{

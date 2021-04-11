@@ -11,7 +11,7 @@ public class EventSystemRuntime : ModuleRules
 		PublicIncludePaths.AddRange(
 			new string[] {
 				// ... add public include paths required here ...
-			}
+            }
             );
 				
 		
@@ -19,7 +19,6 @@ public class EventSystemRuntime : ModuleRules
 			new string[] {
 				// ... add other private include paths required here ...
 				"EventSystemRuntime/Public",
-                "EventSystemRuntime/Public/Setting",
                 "EventSystemRuntime/Public/Systems",
             }
 			);
