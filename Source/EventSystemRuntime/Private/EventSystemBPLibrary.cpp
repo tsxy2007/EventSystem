@@ -45,6 +45,61 @@ FString UEventSystemBPLibrary::Conv_EventHandleToString(const FEventHandle& InRo
 	return InRot.ToString();
 }
 
+int32 UEventSystemBPLibrary::LocalInt(int32 InValue)
+{
+	return InValue;
+}
+
+int64 UEventSystemBPLibrary::LocalInt64(int64 InValue)
+{
+	return InValue;
+}
+
+bool UEventSystemBPLibrary::LocalBool(bool InValue)
+{
+	return InValue;
+}
+
+FText UEventSystemBPLibrary::LocalText(FText InValue)
+{
+	return InValue;
+}
+
+float UEventSystemBPLibrary::Localfloat(float InValue)
+{
+	return InValue;
+}
+
+FString UEventSystemBPLibrary::LocalFString(FString InValue)
+{
+	return InValue;
+}
+
+FLinearColor UEventSystemBPLibrary::LocalLinearColor(FLinearColor InValue)
+{
+	return InValue;
+}
+
+FVector UEventSystemBPLibrary::LocalVector(FVector InValue)
+{
+	return InValue;
+}
+
+FVector2D UEventSystemBPLibrary::LocalVector2D(FVector2D InValue)
+{
+	return InValue;
+}
+
+FRotator UEventSystemBPLibrary::LocalRotator(FRotator InValue)
+{
+	return InValue;
+}
+
+FName UEventSystemBPLibrary::LocalName(FName InValue)
+{
+	return InValue;
+}
+
 void UEventSystemBPLibrary::NotifyEventByKey(const FString& EventId, UObject* Sender, const TArray<FPyOutputParam, TInlineAllocator<8>>& Outparames)
 {
 	UGIEventSubsystem* System = UGIEventSubsystem::Get(Sender);

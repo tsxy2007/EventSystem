@@ -68,8 +68,93 @@ void UEventsK2Node_NotifyEvent::ExpandNode(class FKismetCompilerContext& Compile
 		UEdGraphPin* ParameterPin = FindPin(PinNames[ArgIdx]);
 		if (ParameterPin)
 		{
+			bool bHasConnection = ParameterPin->HasAnyConnections();
+			FString DefaultValue = ParameterPin->GetDefaultAsString();
 			auto InputPin = CallNotifyFuncNode->CreatePin(EGPD_Input, ParameterPin->PinType, ParameterPin->PinName);
-			bError &= CompilerContext.MovePinLinksToIntermediate(*ParameterPin, *InputPin).CanSafeConnect();
+			bool bDefault = false;
+			if (bHasConnection == false)
+			{
+				FName DefaultFuncName;
+				if (ParameterPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Boolean)
+				{
+					DefaultFuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, LocalBool);
+				}
+				else if (ParameterPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Text)
+				{
+					DefaultFuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, LocalText);
+				}
+				else if (ParameterPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Int)
+				{
+					DefaultFuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, LocalInt);
+				}
+				else if (ParameterPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Int64)
+				{
+					DefaultFuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, LocalInt64);
+				}
+				else if (ParameterPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Float)
+				{
+					DefaultFuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, Localfloat);
+				}
+				else if (ParameterPin->PinType.PinCategory == UEdGraphSchema_K2::PC_String )
+				{
+					DefaultFuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, LocalFString);
+				}
+				else if (ParameterPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Name)
+				{
+					DefaultFuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, LocalName);
+				}
+				else if (ParameterPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Struct)
+				{
+					// If you update this logic you'll probably need to update UEdGraphSchema_K2::ShouldHidePinDefaultValue!
+					UScriptStruct* ColorStruct = TBaseStructure<FLinearColor>::Get();
+					UScriptStruct* VectorStruct = TBaseStructure<FVector>::Get();
+					UScriptStruct* Vector2DStruct = TBaseStructure<FVector2D>::Get();
+					UScriptStruct* RotatorStruct = TBaseStructure<FRotator>::Get();
+
+					if (ParameterPin->PinType.PinSubCategoryObject == ColorStruct)
+					{
+						DefaultFuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, LocalLinearColor);
+					}
+					else if ((ParameterPin->PinType.PinSubCategoryObject == VectorStruct))
+					{
+						DefaultFuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, LocalVector);
+					}
+					else if (ParameterPin->PinType.PinSubCategoryObject == RotatorStruct)
+					{
+						DefaultFuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, LocalRotator);
+					}
+					else if (ParameterPin->PinType.PinSubCategoryObject == Vector2DStruct)
+					{
+						DefaultFuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, LocalVector2D);
+					}
+				}
+				else if (ParameterPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Byte)
+				{
+					// Check for valid enum object reference
+					if ((ParameterPin->PinType.PinSubCategoryObject != NULL) && (ParameterPin->PinType.PinSubCategoryObject->IsA(UEnum::StaticClass())))
+					{
+					}
+					else
+					{
+					}
+				}
+				if (DefaultFuncName.IsNone() == false)
+				{
+					UK2Node_CallFunction* LocalValueNode = CompilerContext.SpawnIntermediateNode<UK2Node_CallFunction>(this, SourceGraph);
+					LocalValueNode->FunctionReference.SetExternalMember(DefaultFuncName, UEventSystemBPLibrary::StaticClass());
+					LocalValueNode->AllocateDefaultPins();
+					LocalValueNode->bIsPureFunc = true;
+					UEdGraphPin* InValuePin = LocalValueNode->FindPin(TEXT("InValue"), EGPD_Input);
+					UEdGraphPin* ReValuePin = LocalValueNode->GetReturnValuePin();
+					K2Schema->TrySetDefaultValue(*InValuePin, DefaultValue);
+					bError &= K2Schema->TryCreateConnection(ReValuePin, InputPin);
+					bDefault = true;
+				}
+			}
+			if (!bDefault)
+			{
+				bError &= CompilerContext.MovePinLinksToIntermediate(*ParameterPin, *InputPin).CanSafeConnect();
+			}
 		}
 	}
 	SpawnNode->BreakAllNodeLinks();
