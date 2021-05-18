@@ -11,6 +11,7 @@
 #include "K2Node_CallFunction.h"
 #include "KismetCompilerMisc.h"
 #include "KismetCompiler.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 
 UEventsK2Node_NotifyEvent::UEventsK2Node_NotifyEvent(const FObjectInitializer& ObjectInitializer)
@@ -71,10 +72,9 @@ void UEventsK2Node_NotifyEvent::ExpandNode(class FKismetCompilerContext& Compile
 			bool bHasConnection = ParameterPin->HasAnyConnections();
 			FString DefaultValue = ParameterPin->GetDefaultAsString();
 			auto InputPin = CallNotifyFuncNode->CreatePin(EGPD_Input, ParameterPin->PinType, ParameterPin->PinName);
-			bool bDefault = false;
+			FName DefaultFuncName;
 			if (bHasConnection == false)
 			{
-				FName DefaultFuncName;
 				if (ParameterPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Boolean)
 				{
 					DefaultFuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, LocalBool);
@@ -130,28 +130,31 @@ void UEventsK2Node_NotifyEvent::ExpandNode(class FKismetCompilerContext& Compile
 				}
 				else if (ParameterPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Byte)
 				{
-					// Check for valid enum object reference
-					if ((ParameterPin->PinType.PinSubCategoryObject != NULL) && (ParameterPin->PinType.PinSubCategoryObject->IsA(UEnum::StaticClass())))
+					UEnum* EnumPtr = Cast<UEnum>(ParameterPin->PinType.PinSubCategoryObject.Get());
+					if (EnumPtr)
 					{
+						int32 EnumIndex = EnumPtr->GetIndexByNameString(DefaultValue);
+						if (EnumIndex == INDEX_NONE)
+						{
+							EnumIndex = 0;
+						}
+						DefaultValue = FString::Printf(TEXT("%d"), EnumIndex);
 					}
-					else
-					{
-					}
+					DefaultFuncName = GET_FUNCTION_NAME_CHECKED(UEventSystemBPLibrary, Localuint8);
 				}
-				if (DefaultFuncName.IsNone() == false)
-				{
-					UK2Node_CallFunction* LocalValueNode = CompilerContext.SpawnIntermediateNode<UK2Node_CallFunction>(this, SourceGraph);
-					LocalValueNode->FunctionReference.SetExternalMember(DefaultFuncName, UEventSystemBPLibrary::StaticClass());
-					LocalValueNode->AllocateDefaultPins();
-					LocalValueNode->bIsPureFunc = true;
-					UEdGraphPin* InValuePin = LocalValueNode->FindPin(TEXT("InValue"), EGPD_Input);
-					UEdGraphPin* ReValuePin = LocalValueNode->GetReturnValuePin();
-					K2Schema->TrySetDefaultValue(*InValuePin, DefaultValue);
-					bError &= K2Schema->TryCreateConnection(ReValuePin, InputPin);
-					bDefault = true;
-				}
+				
 			}
-			if (!bDefault)
+			if (DefaultFuncName.IsNone() == false)
+			{
+				UK2Node_CallFunction* LocalValueNode = CompilerContext.SpawnIntermediateNode<UK2Node_CallFunction>(this, SourceGraph);
+				LocalValueNode->FunctionReference.SetExternalMember(DefaultFuncName, UEventSystemBPLibrary::StaticClass());
+				LocalValueNode->AllocateDefaultPins();
+				UEdGraphPin* InValuePin = LocalValueNode->FindPin(TEXT("Value"), EGPD_Input);
+				UEdGraphPin* ReValuePin = LocalValueNode->GetReturnValuePin();
+				K2Schema->TrySetDefaultValue(*InValuePin, DefaultValue);
+				bError &= K2Schema->TryCreateConnection(ReValuePin, InputPin);
+			}
+			else
 			{
 				bError &= CompilerContext.MovePinLinksToIntermediate(*ParameterPin, *InputPin).CanSafeConnect();
 			}

@@ -45,59 +45,64 @@ FString UEventSystemBPLibrary::Conv_EventHandleToString(const FEventHandle& InRo
 	return InRot.ToString();
 }
 
-int32 UEventSystemBPLibrary::LocalInt(int32 InValue)
+uint8 UEventSystemBPLibrary::Localuint8(uint8 Value)
 {
-	return InValue;
+	return Value;
 }
 
-int64 UEventSystemBPLibrary::LocalInt64(int64 InValue)
+int32 UEventSystemBPLibrary::LocalInt(int32 Value)
 {
-	return InValue;
+	return Value;
 }
 
-bool UEventSystemBPLibrary::LocalBool(bool InValue)
+int64 UEventSystemBPLibrary::LocalInt64(int64 Value)
 {
-	return InValue;
+	return Value;
 }
 
-FText UEventSystemBPLibrary::LocalText(FText InValue)
+bool UEventSystemBPLibrary::LocalBool(bool Value)
 {
-	return InValue;
+	return Value;
 }
 
-float UEventSystemBPLibrary::Localfloat(float InValue)
+FText UEventSystemBPLibrary::LocalText(FText Value)
 {
-	return InValue;
+	return Value;
 }
 
-FString UEventSystemBPLibrary::LocalFString(FString InValue)
+float UEventSystemBPLibrary::Localfloat(float Value)
 {
-	return InValue;
+	return Value;
 }
 
-FLinearColor UEventSystemBPLibrary::LocalLinearColor(FLinearColor InValue)
+FString UEventSystemBPLibrary::LocalFString(const FString& Value)
 {
-	return InValue;
+	return Value;
 }
 
-FVector UEventSystemBPLibrary::LocalVector(FVector InValue)
+FLinearColor UEventSystemBPLibrary::LocalLinearColor(FLinearColor Value)
 {
-	return InValue;
+	return Value;
 }
 
-FVector2D UEventSystemBPLibrary::LocalVector2D(FVector2D InValue)
+FVector UEventSystemBPLibrary::LocalVector(FVector Value)
 {
-	return InValue;
+	return Value;
 }
 
-FRotator UEventSystemBPLibrary::LocalRotator(FRotator InValue)
+FVector2D UEventSystemBPLibrary::LocalVector2D(FVector2D Value)
 {
-	return InValue;
+	return Value;
 }
 
-FName UEventSystemBPLibrary::LocalName(FName InValue)
+FRotator UEventSystemBPLibrary::LocalRotator(FRotator Value)
 {
-	return InValue;
+	return Value;
+}
+
+FName UEventSystemBPLibrary::LocalName(const FName& Value)
+{
+	return Value;
 }
 
 void UEventSystemBPLibrary::NotifyEventByKey(const FString& EventId, UObject* Sender, const TArray<FPyOutputParam, TInlineAllocator<8>>& Outparames)
