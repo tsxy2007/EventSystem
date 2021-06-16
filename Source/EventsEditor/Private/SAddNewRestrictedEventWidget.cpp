@@ -22,7 +22,7 @@ SAddNewRestrictedEventWidget::~SAddNewRestrictedEventWidget()
 
 void SAddNewRestrictedEventWidget::Construct(const FArguments& InArgs)
 {
-	FText HintText = LOCTEXT("NewTagNameHint", "X.Y.Z");
+	FText HintText = LOCTEXT("NewEventNameHint", "X.Y.Z");
 	DefaultNewName = InArgs._NewRestrictedTagName;
 	if (DefaultNewName.IsEmpty() == false)
 	{
@@ -53,7 +53,7 @@ void SAddNewRestrictedEventWidget::Construct(const FArguments& InArgs)
 			.AutoWidth()
 			[
 				SNew(STextBlock)
-				.Text(LOCTEXT("NewTagName", "Name:"))
+				.Text(LOCTEXT("NewEventName", "Name:"))
 			]
 
 			+ SHorizontalBox::Slot()
@@ -79,7 +79,7 @@ void SAddNewRestrictedEventWidget::Construct(const FArguments& InArgs)
 			.AutoWidth()
 			[
 				SNew(STextBlock)
-				.Text(LOCTEXT("TagComment", "Comment:"))
+				.Text(LOCTEXT("EventComment", "Comment:"))
 			]
 
 			+ SHorizontalBox::Slot()
@@ -89,7 +89,7 @@ void SAddNewRestrictedEventWidget::Construct(const FArguments& InArgs)
 			[
 				SAssignNew(TagCommentTextBox, SEditableTextBox)
 				.MinDesiredWidth(240.0f)
-				.HintText(LOCTEXT("TagCommentHint", "Comment"))
+				.HintText(LOCTEXT("EventCommentHint", "Comment"))
 				.OnTextCommitted(this, &SAddNewRestrictedEventWidget::OnCommitNewTagName)
 			]
 		]
@@ -127,7 +127,7 @@ void SAddNewRestrictedEventWidget::Construct(const FArguments& InArgs)
 			.AutoWidth()
 			[
 				SNew(STextBlock)
-				.Text(LOCTEXT("CreateTagSource", "Source:"))
+				.Text(LOCTEXT("CreateEventSource", "Source:"))
 			]
 
 			+ SHorizontalBox::Slot()
@@ -160,7 +160,7 @@ void SAddNewRestrictedEventWidget::Construct(const FArguments& InArgs)
 			.AutoWidth()
 			[
 				SNew(SButton)
-				.Text(LOCTEXT("AddNew", "Add New Tag"))
+				.Text(LOCTEXT("AddNew", "Add New Event"))
 				.OnClicked(this, &SAddNewRestrictedEventWidget::OnAddNewTagButtonPressed)
 			]
 		]
@@ -280,7 +280,7 @@ void SAddNewRestrictedEventWidget::ValidateNewRestrictedTag()
 
 	if (TagSource == NAME_None)
 	{
-		FNotificationInfo Info(LOCTEXT("NoRestrictedSource", "You must specify a source file for restricted gameplay tags."));
+		FNotificationInfo Info(LOCTEXT("NoRestrictedSource", "You must specify a source file for restricted events."));
 		Info.ExpireDuration = 10.f;
 		Info.bUseSuccessFailIcons = true;
 		Info.Image = FEditorStyle::GetBrush(TEXT("MessageLog.Error"));
@@ -332,8 +332,8 @@ void SAddNewRestrictedEventWidget::ValidateNewRestrictedTag()
 
 			FNotificationInfo Info(FText::FromString(StringToDisplay));
 			Info.ExpireDuration = 10.f;
-			Info.ButtonDetails.Add(FNotificationButtonInfo(LOCTEXT("RestrictedTagPopupButtonAccept", "Yes"), FText(), FSimpleDelegate::CreateSP(this, &SAddNewRestrictedEventWidget::CreateNewRestrictedEvent), SNotificationItem::CS_None));
-			Info.ButtonDetails.Add(FNotificationButtonInfo(LOCTEXT("RestrictedTagPopupButtonReject", "No"), FText(), FSimpleDelegate::CreateSP(this, &SAddNewRestrictedEventWidget::CancelNewTag), SNotificationItem::CS_None));
+			Info.ButtonDetails.Add(FNotificationButtonInfo(LOCTEXT("RestrictedEventPopupButtonAccept", "Yes"), FText(), FSimpleDelegate::CreateSP(this, &SAddNewRestrictedEventWidget::CreateNewRestrictedEvent), SNotificationItem::CS_None));
+			Info.ButtonDetails.Add(FNotificationButtonInfo(LOCTEXT("RestrictedEventPopupButtonReject", "No"), FText(), FSimpleDelegate::CreateSP(this, &SAddNewRestrictedEventWidget::CancelNewTag), SNotificationItem::CS_None));
 
 			AddRestrictedEventDialog = FSlateNotificationManager::Get().AddNotification(Info);
 		}
@@ -395,7 +395,7 @@ FText SAddNewRestrictedEventWidget::CreateTagSourcesComboBoxContent() const
 {
 	const bool bHasSelectedItem = TagSourcesComboBox.IsValid() && TagSourcesComboBox->GetSelectedItem().IsValid();
 
-	return bHasSelectedItem ? FText::FromName(*TagSourcesComboBox->GetSelectedItem().Get()) : LOCTEXT("NewTagLocationNotSelected", "Not selected");
+	return bHasSelectedItem ? FText::FromName(*TagSourcesComboBox->GetSelectedItem().Get()) : LOCTEXT("NewEventLocationNotSelected", "Not selected");
 }
 
 #undef LOCTEXT_NAMESPACE

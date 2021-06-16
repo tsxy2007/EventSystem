@@ -181,10 +181,10 @@ FReply FEventContainerCustomization::OnSingleTagMouseButtonPressed(const FGeomet
 
 		FUIAction SearchForReferencesAction(FExecuteAction::CreateSP(this, &FEventContainerCustomization::OnSingleTagSearchForReferences, TagName));
 
-		MenuBuilder.BeginSection(NAME_None, FText::Format(LOCTEXT("SingleTagMenuHeading", "Tag Actions ({0})"), FText::AsCultureInvariant(TagName)));
+		MenuBuilder.BeginSection(NAME_None, FText::Format(LOCTEXT("SingleEventMenuHeading", "Event Actions ({0})"), FText::AsCultureInvariant(TagName)));
 		MenuBuilder.AddMenuEntry(
-			LOCTEXT("SingleTagSearchForReferences", "Search For References"),
-			FText::Format(LOCTEXT("SingleTagSearchForReferencesTooltip", "Find references to the tag {0}"), FText::AsCultureInvariant(TagName)),
+			LOCTEXT("SingleEventSearchForReferences", "Search For References"),
+			FText::Format(LOCTEXT("SingleEventSearchForReferencesTooltip", "Find references to the event {0}"), FText::AsCultureInvariant(TagName)),
 			FSlateIcon(),
 			SearchForReferencesAction);
 		MenuBuilder.EndSection();
@@ -256,7 +256,7 @@ FReply FEventContainerCustomization::OnRemoveTagClicked(FString TagName)
 	});
 
 	{
-		FScopedTransaction Transaction(LOCTEXT("RemoveEventFromContainer", "Remove Gameplay Tag"));
+		FScopedTransaction Transaction(LOCTEXT("RemoveEventFromContainer", "Remove Event"));
 		for (int i = 0; i < NewValues.Num(); i++)
 		{
 			StructPropertyHandle->SetPerObjectValue(i, NewValues[i]);
@@ -314,7 +314,7 @@ void FEventContainerCustomization::OnEventListMenuOpenStateChanged(bool bIsOpene
 
 FReply FEventContainerCustomization::OnClearAllButtonClicked()
 {
-	FScopedTransaction Transaction(LOCTEXT("EventContainerCustomization_RemoveAllTags", "Remove All Events"));
+	FScopedTransaction Transaction(LOCTEXT("EventContainerCustomization_RemoveAllEvents", "Remove All Events"));
 
 	for (int32 ContainerIdx = 0; ContainerIdx < EditableContainers.Num(); ++ContainerIdx)
 	{

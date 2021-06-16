@@ -183,13 +183,13 @@ FReply FEventQueryCustomization::OnEditButtonClicked()
 			{
 				FText const AssetName = FText::Format(LOCTEXT("EventDetailsBase_MultipleAssets", "{0} Assets"), FText::AsNumber(OuterObjects.Num()));
 				FText const PropertyName = StructPropertyHandle->GetPropertyDisplayName();
-				Title = FText::Format(LOCTEXT("EventQueryCustomization_BaseWidgetTitle", "Tag Editor: {0} {1}"), PropertyName, AssetName);
+				Title = FText::Format(LOCTEXT("EventQueryCustomization_BaseWidgetTitle", "Event Editor: {0} {1}"), PropertyName, AssetName);
 			}
 			else if (OuterObjects.Num() > 0 && OuterObjects[0])
 			{
 				FText const AssetName = FText::FromString(OuterObjects[0]->GetName());
 				FText const PropertyName = StructPropertyHandle->GetPropertyDisplayName();
-				Title = FText::Format(LOCTEXT("EventQueryCustomization_BaseWidgetTitle", "Tag Editor: {0} {1}"), PropertyName, AssetName);
+				Title = FText::Format(LOCTEXT("EventQueryCustomization_BaseWidgetTitle", "Event Editor: {0} {1}"), PropertyName, AssetName);
 			}
 
 			EventQueryWidgetWindow = SNew(SWindow)

@@ -40,7 +40,7 @@ public class EventSystemRuntime : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"DeveloperSettings",
+				//"DeveloperSettings", // UE4.26 FIX (blowpunch)
                 "JsonUtilities",
                 "Json",
 				// ... add private dependencies that you statically link with here ...	

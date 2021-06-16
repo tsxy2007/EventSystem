@@ -171,10 +171,10 @@ void UEventsK2Node_NotifyEvent::AllocateDefaultPins()
 
 FText UEventsK2Node_NotifyEvent::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
-	return NSLOCTEXT("K2Node", "Notify_EVENT_Tag", "Notify Event");
+	return NSLOCTEXT("K2Node", "Notify_EVENT_Event", "Notify Event");
 }
 
 FText UEventsK2Node_NotifyEvent::GetTooltipText() const
 {
-	return NSLOCTEXT("K2Node", "UEventsK2Node_NotifyEvent_ToolTip", "Selects an output that matches the input value");
+	return NSLOCTEXT("K2Node", "UEventsK2Node_NotifyEvent_ToolTip", "Notify Listen Event");
 }

@@ -17,7 +17,7 @@ class FBlueprintActionDatabaseRegistrar;
 #define DECLARE_SCOPE_HIERARCHICAL_COUNTER_RIGUNIT() \
 	DECLARE_SCOPE_HIERARCHICAL_COUNTER_FUNC()
 
-UCLASS()
+UCLASS(Abstract)
 class UEventsK2Node_EventBase : public UK2Node
 {
 	GENERATED_UCLASS_BODY()

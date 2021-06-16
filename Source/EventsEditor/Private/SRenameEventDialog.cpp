@@ -36,7 +36,7 @@ void SRenameEventDialog::Construct(const FArguments& InArgs)
 				.AutoWidth()
 				[
 					SNew( STextBlock )
-					.Text( LOCTEXT("CurrentTag", "Current Tag:"))
+					.Text( LOCTEXT("CurrentEvent", "Current Event:"))
 				]
 
 				+SHorizontalBox::Slot()
@@ -64,7 +64,7 @@ void SRenameEventDialog::Construct(const FArguments& InArgs)
 				.Padding(0.0f, 4.0f)
 				[
 					SNew( STextBlock )
-					.Text( LOCTEXT("NewTag", "New Tag:" ))
+					.Text( LOCTEXT("NewEvent", "New Event:" ))
 				]
 
 				+SHorizontalBox::Slot()
@@ -99,7 +99,7 @@ void SRenameEventDialog::Construct(const FArguments& InArgs)
 					.OnClicked( this, &SRenameEventDialog::OnRenameClicked )
 					[
 						SNew( STextBlock )
-						.Text( LOCTEXT("RenameTagButtonText", "Rename" ) )
+						.Text( LOCTEXT("RenameEventButtonText", "Rename" ) )
 					]
 				]
 

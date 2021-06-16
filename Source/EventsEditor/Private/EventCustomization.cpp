@@ -79,7 +79,7 @@ void FEventCustomization::CustomizeHeader(TSharedRef<class IPropertyHandle> InSt
 	]
 	.AddCustomContextMenuAction(SearchForReferencesAction,
 		LOCTEXT("FEventCustomization_SearchForReferences", "Search For References"),
-		LOCTEXT("FEventCustomization_SearchForReferencesTooltip", "Find references for this tag"),
+		LOCTEXT("FEventCustomization_SearchForReferencesTooltip", "Find references for this event"),
 		FSlateIcon());
 
 	GEditor->RegisterForUndo(this);

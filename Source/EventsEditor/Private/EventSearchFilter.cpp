@@ -65,7 +65,7 @@ void FFrontendFilter_Events::ModifyContextMenu(FMenuBuilder& MenuBuilder)
 {
 	FUIAction Action;
 
-	MenuBuilder.BeginSection(TEXT("ComparsionSection"), LOCTEXT("ComparisonSectionHeading", "Gameplay Tag(s) to search for"));
+	MenuBuilder.BeginSection(TEXT("ComparsionSection"), LOCTEXT("ComparisonSectionHeading", "Event(s) to search for"));
 
 	TSharedRef<SWidget> TagWidget =
 		SNew(SVerticalBox)
@@ -111,11 +111,11 @@ FText FFrontendFilter_Events::GetToolTipText() const
 {
 	if (TagContainer->Num() == 0)
 	{
-		return LOCTEXT("AnyEventFilterDisplayTooltip", "Search for any *loaded* Blueprint or asset that contains a gameplay tag (right-click to choose tags).");
+		return LOCTEXT("AnyEventFilterDisplayTooltip", "Search for any *loaded* Blueprint or asset that contains an event (right-click to choose events).");
 	}
 	else
 	{
-		return LOCTEXT("EventFilterDisplayTooltip", "Search for any *loaded* Blueprint or asset that has a gameplay tag which matches any of the selected tags (right-click to choose tags).");
+		return LOCTEXT("EventFilterDisplayTooltip", "Search for any *loaded* Blueprint or asset that has an event which matches any of the selected events (right-click to choose events).");
 	}
 }
 
@@ -209,7 +209,10 @@ bool FFrontendFilter_Events::ProcessProperty(void* Data, FProperty* Prop) const
 bool FFrontendFilter_Events::PassesFilter(FAssetFilterType InItem) const
 {
 	FAssetData ItemAssetData;
-	if (InItem.Legacy_TryGetAssetData(ItemAssetData))
+	// FIX (blowpunch)
+	//if (InItem.Legacy_TryGetAssetData(ItemAssetData)) // UE 4.26
+	if (1)
+	///
 	{
 		if (UObject* Object = ItemAssetData.FastGetAsset(false))
 		{

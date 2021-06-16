@@ -99,7 +99,7 @@ void SEventWidget::Construct(const FArguments& InArgs, const TArray<FEditableEve
 		}
 	}
 
-	const FText NewTagText = bRestrictedTags ? LOCTEXT("AddNewRestrictedTag", "Add New Restricted Gameplay Tag") : LOCTEXT("AddNewTag", "Add New Gameplay Tag");
+	const FText NewTagText = bRestrictedTags ? LOCTEXT("AddNewRestrictedEvent", "Add New Restricted Event") : LOCTEXT("AddNewEvent", "Add New Event");
 
 	ChildSlot
 	[
@@ -182,7 +182,7 @@ void SEventWidget::Construct(const FArguments& InArgs, const TArray<FEditableEve
 					.Visibility(this, &SEventWidget::DetermineAddNewSourceExpandableUIVisibility)
 					[
 						SNew(STextBlock)
-						.Text(LOCTEXT("AddNewSource", "Add New Tag Source"))
+						.Text(LOCTEXT("AddNewSource", "Add New Events Source"))
 					]
 				]
 			]
@@ -451,7 +451,9 @@ TSharedRef<ITableRow> SEventWidget::OnGenerateRow(TSharedPtr<FEventNode> InItem,
 	}
 
 	return SNew(STableRow< TSharedPtr<FEventNode> >, OwnerTable)
-		.Style(FEditorStyle::Get(), "EventTreeView")
+		// FIX (blowpunch)
+		//.Style(FEditorStyle::Get(), "EventTreeView")
+		.Style(FEditorStyle::Get(), "GameplayTagTreeView")
 		[
 			SNew( SHorizontalBox )
 
@@ -490,7 +492,7 @@ TSharedRef<ITableRow> SEventWidget::OnGenerateRow(TSharedPtr<FEventNode> InItem,
 			.HAlign(HAlign_Right)
 			[
 				SNew(SCheckBox)
-				.ToolTipText(LOCTEXT("AllowsChildren", "Does this restricted tag allow non-restricted children"))
+				.ToolTipText(LOCTEXT("AllowsChildren", "Does this restricted event allow non-restricted children"))
 				.OnCheckStateChanged(this, &SEventWidget::OnAllowChildrenTagCheckStatusChanged, InItem)
 				.IsChecked(this, &SEventWidget::IsAllowChildrenTagChecked, InItem)
 				.Visibility(this, &SEventWidget::DetermineAllowChildrenVisible, InItem)
@@ -502,7 +504,7 @@ TSharedRef<ITableRow> SEventWidget::OnGenerateRow(TSharedPtr<FEventNode> InItem,
 			.HAlign(HAlign_Right)
 			[
 				SNew( SButton )
-				.ToolTipText( LOCTEXT("AddSubtag", "Add Subtag") )
+				.ToolTipText( LOCTEXT("AddSubevent", "Add Subevent") )
 				.Visibility(this, &SEventWidget::DetermineAddNewSubTagWidgetVisibility, InItem)
 				.ButtonStyle(FEditorStyle::Get(), "HoverHintOnly")
 				.OnClicked( this, &SEventWidget::OnAddSubtagClicked, InItem )
@@ -566,7 +568,7 @@ void SEventWidget::OnTagCheckStatusChanged(ECheckBoxState NewCheckState, TShared
 
 void SEventWidget::OnTagChecked(TSharedPtr<FEventNode> NodeChecked)
 {
-	FScopedTransaction Transaction( LOCTEXT("EventWidget_AddTags", "Add Events") );
+	FScopedTransaction Transaction( LOCTEXT("EventWidget_AddEvents", "Add Events") );
 
 	UEventsManager& TagsManager = UEventsManager::Get();
 
@@ -609,7 +611,7 @@ void SEventWidget::OnTagChecked(TSharedPtr<FEventNode> NodeChecked)
 
 void SEventWidget::OnTagUnchecked(TSharedPtr<FEventNode> NodeUnchecked)
 {
-	FScopedTransaction Transaction( LOCTEXT("EventWidget_RemoveTags", "Remove Events"));
+	FScopedTransaction Transaction( LOCTEXT("EventWidget_RemoveEvents", "Remove Events"));
 	if (NodeUnchecked.IsValid())
 	{
 		UEventsManager& TagsManager = UEventsManager::Get();
@@ -786,7 +788,7 @@ EVisibility SEventWidget::DetermineAllowChildrenVisible(TSharedPtr<FEventNode> N
 
 FReply SEventWidget::OnClearAllClicked()
 {
-	FScopedTransaction Transaction( LOCTEXT("EventWidget_RemoveAllTags", "Remove All Events") );
+	FScopedTransaction Transaction( LOCTEXT("EventWidget_RemoveAllEvents", "Remove All Events") );
 
 	for (int32 ContainerIdx = 0; ContainerIdx < TagContainers.Num(); ++ContainerIdx)
 	{
@@ -897,7 +899,7 @@ TSharedRef<SWidget> SEventWidget::MakeTagActionsMenu(TSharedPtr<FEventNode> InTa
 	{
 		FExecuteAction RenameAction = FExecuteAction::CreateSP(this, &SEventWidget::OnRenameTag, InTagNode);
 
-		MenuBuilder.AddMenuEntry(LOCTEXT("EventWidget_RenameTag", "Rename"), LOCTEXT("EventWidget_RenameTagTooltip", "Rename this tag"), FSlateIcon(), FUIAction(RenameAction));
+		MenuBuilder.AddMenuEntry(LOCTEXT("EventWidget_RenameEvent", "Rename"), LOCTEXT("EventWidget_RenameEventTooltip", "Rename this event"), FSlateIcon(), FUIAction(RenameAction));
 	}
 
 	// Delete
@@ -905,25 +907,25 @@ TSharedRef<SWidget> SEventWidget::MakeTagActionsMenu(TSharedPtr<FEventNode> InTa
 	{
 		FExecuteAction DeleteAction = FExecuteAction::CreateSP(this, &SEventWidget::OnDeleteTag, InTagNode);
 
-		MenuBuilder.AddMenuEntry(LOCTEXT("EventWidget_DeleteTag", "Delete"), LOCTEXT("EventWidget_DeleteTagTooltip", "Delete this tag"), FSlateIcon(), FUIAction(DeleteAction));
+		MenuBuilder.AddMenuEntry(LOCTEXT("EventWidget_DeleteEvent", "Delete"), LOCTEXT("EventWidget_DeleteEventTooltip", "Delete this event"), FSlateIcon(), FUIAction(DeleteAction));
 	}
 
 	if (IsExactTagInCollection(InTagNode))
 	{
 		FExecuteAction RemoveAction = FExecuteAction::CreateSP(this, &SEventWidget::OnRemoveTag, InTagNode);
-		MenuBuilder.AddMenuEntry(LOCTEXT("EventWidget_RemoveTag", "Remove Exact Tag"), LOCTEXT("EventWidget_RemoveTagTooltip", "Remove this exact tag, Parent and Child Tags will not be effected."), FSlateIcon(), FUIAction(RemoveAction));
+		MenuBuilder.AddMenuEntry(LOCTEXT("EventWidget_RemoveEvent", "Remove Exact Event"), LOCTEXT("EventWidget_RemoveEventTooltip", "Remove this exact tag, parent and child tags will not be effected."), FSlateIcon(), FUIAction(RemoveAction));
 	}
 	else
 	{
 		FExecuteAction AddAction = FExecuteAction::CreateSP(this, &SEventWidget::OnAddTag, InTagNode);
-		MenuBuilder.AddMenuEntry(LOCTEXT("EventWidget_AddTag", "Add Exact Tag"), LOCTEXT("EventWidget_AddTagTooltip", "Add this exact tag, Parent and Child Child Tags will not be effected."), FSlateIcon(), FUIAction(AddAction));
+		MenuBuilder.AddMenuEntry(LOCTEXT("EventWidget_AddEvent", "Add Exact Event"), LOCTEXT("EventWidget_AddEventTooltip", "Add this exact event, parent and child-child event will not be effected."), FSlateIcon(), FUIAction(AddAction));
 	}
 
 	// Search for References
 	if (FEditorDelegates::OnOpenReferenceViewer.IsBound())
 	{
 		FExecuteAction SearchForReferencesAction = FExecuteAction::CreateSP(this, &SEventWidget::OnSearchForReferences, InTagNode);
-		MenuBuilder.AddMenuEntry(LOCTEXT("EventWidget_SearchForReferences", "Search For References"), LOCTEXT("EventWidget_SearchForReferencesTooltip", "Find references for this tag"), FSlateIcon(), FUIAction(SearchForReferencesAction));
+		MenuBuilder.AddMenuEntry(LOCTEXT("EventWidget_SearchForReferences", "Search For References"), LOCTEXT("EventWidget_SearchForReferencesTooltip", "Find references for this event"), FSlateIcon(), FUIAction(SearchForReferencesAction));
 	}
 
 	return MenuBuilder.MakeWidget();
@@ -1074,7 +1076,7 @@ void SEventWidget::VerifyAssetTagValidity()
 
 				FFormatNamedArguments Arguments;
 				Arguments.Add(TEXT("Objects"), FText::FromString( InvalidTagNames ));
-				FText DialogText = FText::Format( LOCTEXT("EventWidget_InvalidTags", "Invalid Tags that have been removed: \n\n{Objects}"), Arguments );
+				FText DialogText = FText::Format( LOCTEXT("EventWidget_InvalidEvents", "Invalid Events that have been removed: \n\n{Objects}"), Arguments );
 				FText DialogTitle = LOCTEXT("EventWidget_Warning", "Warning");
 				FMessageDialog::Open( EAppMsgType::Ok, DialogText, &DialogTitle );
 			}
@@ -1355,7 +1357,7 @@ void SEventWidget::OpenRenameEventDialog(TSharedPtr<FEventNode> EventNode) const
 {
 	TSharedRef<SWindow> RenameTagWindow =
 		SNew(SWindow)
-		.Title(LOCTEXT("RenameTagWindowTitle", "Rename Gameplay Tag"))
+		.Title(LOCTEXT("RenameEventWindowTitle", "Rename Event"))
 		.ClientSize(FVector2D(320.0f, 110.0f))
 		.SizingRule(ESizingRule::FixedSize)
 		.SupportsMaximize(false)

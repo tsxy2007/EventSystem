@@ -44,7 +44,4 @@ public:
 
 	/** Delegate that gets called after the settings have changed in the editor */
 	static EVENTSRUNTIME_API FSimpleMulticastDelegate OnTagSettingsChanged;
-
-
 };
-

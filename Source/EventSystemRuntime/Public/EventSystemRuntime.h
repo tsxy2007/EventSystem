@@ -3,11 +3,13 @@
 
 #include "Modules/ModuleManager.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(EventSystem, All, All);
+
 class FEventSystemRuntimeModule : public IModuleInterface
 {
 public:
 
 	/** IModuleInterface implementation */
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
+	virtual void StartupModule() override {};
+	virtual void ShutdownModule() override {};
 };

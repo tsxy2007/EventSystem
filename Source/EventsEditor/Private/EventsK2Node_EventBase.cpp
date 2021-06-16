@@ -85,10 +85,37 @@ void UEventsK2Node_EventBase::PostLoad()
 	Super::PostLoad();
 }
 
+// FIX (blowpunch)
 void UEventsK2Node_EventBase::PinDefaultValueChanged(UEdGraphPin* Pin)
 {
 	if (Pin == GetEventPin())
 	{
+		TSharedPtr<FEventNode> Node;
+		bool bNodeRemoved = false;
+		{
+			FName TagNodeName;
+			FString MsgKey = Pin->GetDefaultAsString();
+
+			if (!Pin->PinFriendlyName.IsEmpty())
+			{
+				TagNodeName = FName(*Pin->PinFriendlyName.ToString());
+				bNodeRemoved = MsgKey.IsEmpty();
+			}
+			else {
+				FString Left;
+				FString Right;
+				FString Key;
+				MsgKey.Split("(TagName=\"", &Left, &Right);
+				Right.Split("\")", &Key, &Left);
+				auto MsgTag = FEventInfo::RequestEvent(*Key, false);
+				TagNodeName = MsgTag.GetTagName();
+			}
+
+			Node = UEventsManager::Get().FindTagNode(TagNodeName);
+		}
+
+		if (!Node) return;
+		if (Pin->PinFriendlyName.IsEmpty()) Pin->PinFriendlyName = FText::FromName(Node->GetSimpleTagName());
 	
 		TArray<UEdGraphPin*> OldPins = Pins;
 		TArray<UEdGraphPin*> RemovedPins;
@@ -98,43 +125,45 @@ void UEventsK2Node_EventBase::PinDefaultValueChanged(UEdGraphPin* Pin)
 			{
 				continue;
 			}
-			if (Pins[PinIdx]->PinName.ToString().StartsWith(MessageParamPrefix))
+			for (auto& ParameterInfo : Node->Parameters)
 			{
-				RemovedPins.Add(Pins[PinIdx]);
-				PinNames.Remove(Pins[PinIdx]->PinName);
-				RemoveUserDefinedPinByName(Pins[PinIdx]->PinName);
-				Pins.RemoveAt(PinIdx);
-			}
-		}
-
-		FString MsgKey = Pin->GetDefaultAsString();
-		FString Left;
-		FString Right;
-		FString Key;
-		MsgKey.Split("(TagName=\"", &Left,&Right);
-		Right.Split("\")",&Key,&Left);
-		auto MsgTag = FEventInfo::RequestEvent(*Key, false);
-		auto Node = UEventsManager::Get().FindTagNode(MsgTag.GetTagName());
-		if (Node)
-		{
-			for (auto& ParamterInfo : Node->Parameters)
-			{
-				FEdGraphPinType PinType;
-				if (UESBPLibrary::GetPinTypeFromStr(ParamterInfo.Type.ToString(), PinType))
+				//if (Pins[PinIdx]->PinName.ToString().StartsWith(MessageParamPrefix))
+				if (Pins[PinIdx]->PinName.ToString().StartsWith(ParameterInfo.Name.ToString())) // FIX (blowpunch)
 				{
-					AddInnerPin(*UEventsK2Node_EventBase::MessageParamPrefix, PinType);
+					RemovedPins.Add(Pins[PinIdx]);
+					PinNames.Remove(Pins[PinIdx]->PinName);
+					RemoveUserDefinedPinByName(Pins[PinIdx]->PinName);
+					Pins.RemoveAt(PinIdx);
+					break;
 				}
 			}
 		}
-#if ENGINE_MINOR_VERSION < 20
+
+		if (bNodeRemoved)
+		{
+			Pin->PinFriendlyName = FText::GetEmpty();
+		}
+		else {
+
+			for (auto& ParameterInfo : Node->Parameters)
+			{
+				FEdGraphPinType PinType;
+				if (UESBPLibrary::GetPinTypeFromStr(ParameterInfo.Type.ToString(), PinType))
+				{
+					// FIX (blowpunch)
+					AddInnerPin(*ParameterInfo.Name.ToString(), PinType);
+					//AddInnerPin(*UEventsK2Node_EventBase::MessageParamPrefix, PinType);
+					///
+				}
+			}
+		}
+
 		RewireOldPinsToNewPins(RemovedPins, Pins);
-#else
-		RewireOldPinsToNewPins(RemovedPins, Pins);
-#endif
 		GetGraph()->NotifyGraphChanged();
 		Super::PinDefaultValueChanged(Pin);
-		return;
 	}
+	/*
+	// TODO remove??
 	static bool bRecursivelyChangingDefaultValue = false;
 	for (int32 Index = 0; Index < UserDefinedPins.Num(); ++Index)
 	{
@@ -151,7 +180,9 @@ void UEventsK2Node_EventBase::PinDefaultValueChanged(UEdGraphPin* Pin)
 			}
 		}
 	}
+	*/
 }
+///
 
 FString UEventsK2Node_EventBase::MessageParamPrefix = TEXT("Param");
 
@@ -175,7 +206,7 @@ void UEventsK2Node_EventBase::AllocateDefaultPins()
 
 FText UEventsK2Node_EventBase::GetTooltipText() const
 {
-	return NSLOCTEXT("K2Node", "TestTag_EVENT_ToolTip", "Selects an output that matches the input value");
+	return NSLOCTEXT("K2Node", "TestEvent_EVENT_ToolTip", "Selects an output that matches the input value");
 }
 
 void UEventsK2Node_EventBase::GetMenuActions(FBlueprintActionDatabaseRegistrar& ActionRegistrar) const

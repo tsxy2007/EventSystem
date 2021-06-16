@@ -89,7 +89,7 @@ enum class EEventSourceType : uint8
 {
 	Native,				// Was added from C++ code
 	DefaultTagList,		// The default tag list in DefaultEvents.ini
-	TagList,			// Another tag list from an ini in tags/*.ini
+	TagList,			// Another tag list from an ini in Events/*.ini
 	RestrictedTagList,	// Restricted tags from an ini
 	DataTable,			// From a DataTable
 	Invalid,			// Not a real source

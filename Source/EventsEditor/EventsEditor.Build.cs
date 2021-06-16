@@ -40,7 +40,7 @@ namespace UnrealBuildTool.Rules
 					"PropertyEditor",
 					"EventSystemRuntime",
 					"BlueprintCompilerCppBackend",
-                    "ContentBrowserData",
+                    //"ContentBrowserData", // UE4.26 FIX (blowpunch)
                 "JsonUtilities",
                 "Json",
                 }

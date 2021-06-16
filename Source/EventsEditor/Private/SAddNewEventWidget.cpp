@@ -26,7 +26,7 @@ SAddNewEventWidget::~SAddNewEventWidget()
 void SAddNewEventWidget::Construct(const FArguments& InArgs)
 {
 	
-	FText HintText = LOCTEXT("NewTagNameHint", "X.Y.Z");
+	FText HintText = LOCTEXT("NewEventNameHint", "X.Y.Z");
 	DefaultNewName = InArgs._NewTagName;
 	if (DefaultNewName.IsEmpty() == false)
 	{
@@ -58,7 +58,7 @@ void SAddNewEventWidget::Construct(const FArguments& InArgs)
 			.AutoWidth()
 			[
 				SNew(STextBlock)
-				.Text(LOCTEXT("NewTagName", "Name:"))
+				.Text(LOCTEXT("NewEventName", "Name:"))
 			]
 
 			+ SHorizontalBox::Slot()
@@ -84,7 +84,7 @@ void SAddNewEventWidget::Construct(const FArguments& InArgs)
 			.AutoWidth()
 			[
 				SNew(STextBlock)
-				.Text(LOCTEXT("TagParameters", "Parameters:"))
+				.Text(LOCTEXT("EventParameters", "Parameters:"))
 			]
 
 			+ SHorizontalBox::Slot()
@@ -114,7 +114,7 @@ void SAddNewEventWidget::Construct(const FArguments& InArgs)
 			.AutoWidth()
 			[
 				SNew(STextBlock)
-				.Text(LOCTEXT("CreateTagSource", "Source:"))
+				.Text(LOCTEXT("CreateEventSource", "Source:"))
 			]
 
 			+ SHorizontalBox::Slot()
@@ -157,7 +157,7 @@ void SAddNewEventWidget::Construct(const FArguments& InArgs)
 			.AutoWidth()
 			[
 				SNew(SButton)
-				.Text(LOCTEXT("AddNew", "Add New Tag"))
+				.Text(LOCTEXT("AddNew", "Add New Event"))
 				.OnClicked(this, &SAddNewEventWidget::OnAddNewTagButtonPressed)
 			]
 		]
@@ -310,7 +310,7 @@ void SAddNewEventWidget::CreateNewEvent()
 		(IsValidTag.IsBound() && !IsValidTag.Execute(TagName, &ErrorMsg))
 		)
 	{
-		FText MessageTitle(LOCTEXT("InvalidTag", "Invalid Tag"));
+		FText MessageTitle(LOCTEXT("InvalidEvent", "Invalid Event"));
 		FMessageDialog::Open(EAppMsgType::Ok, ErrorMsg, &MessageTitle);
 		return;
 	}
@@ -342,7 +342,7 @@ FText SAddNewEventWidget::CreateTagSourcesComboBoxContent() const
 {
 	const bool bHasSelectedItem = TagSourcesComboBox.IsValid() && TagSourcesComboBox->GetSelectedItem().IsValid();
 
-	return bHasSelectedItem ? FText::FromName(*TagSourcesComboBox->GetSelectedItem().Get()) : LOCTEXT("NewTagLocationNotSelected", "Not selected");
+	return bHasSelectedItem ? FText::FromName(*TagSourcesComboBox->GetSelectedItem().Get()) : LOCTEXT("NewEventLocationNotSelected", "Not selected");
 }
 
 

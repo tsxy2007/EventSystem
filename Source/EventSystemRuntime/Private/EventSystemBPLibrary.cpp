@@ -13,8 +13,6 @@ UEventSystemBPLibrary::UEventSystemBPLibrary(const FObjectInitializer& ObjectIni
 
 }
 
-
-
 void UEventSystemBPLibrary::NotifyEventByKeyVariadic(const FString& MessageId, UObject* Sender)
 {
 
@@ -23,22 +21,23 @@ void UEventSystemBPLibrary::NotifyEventByKeyVariadic(const FString& MessageId, U
 FEventHandle UEventSystemBPLibrary::ListenEventByKey(const FString& MessageId, UObject* Listener, FName EventName)
 {
 	UGIEventSubsystem* System = UGIEventSubsystem::Get(Listener);
-	if (System)
-	{
-		return System->ListenEvent(MessageId, Listener, EventName);
-	}
+	if (System) return System->ListenEvent(MessageId, Listener, EventName);
 	return FEventHandle();
 }
-
 
 void UEventSystemBPLibrary::UnListenEvent(const UObject* WorldContext, const FEventHandle& Handle)
 {
 	UGIEventSubsystem* System = UGIEventSubsystem::Get(WorldContext);
-	if (System)
-	{
-		System->UnListenEvent(Handle);
-	}
+	if (System) System->UnListenEvent(Handle);
 }
+
+// FIX (blowpunch)
+void UEventSystemBPLibrary::UnListenEvents(UObject* Listener)
+{
+	UGIEventSubsystem* System = UGIEventSubsystem::Get(Listener);
+	if (System) System->UnListenEvents(Listener);
+}
+///
 
 FString UEventSystemBPLibrary::Conv_EventHandleToString(const FEventHandle& InRot)
 {
@@ -108,10 +107,7 @@ FName UEventSystemBPLibrary::LocalName(const FName& Value)
 void UEventSystemBPLibrary::NotifyEventByKey(const FString& EventId, UObject* Sender, const TArray<FPyOutputParam, TInlineAllocator<8>>& Outparames)
 {
 	UGIEventSubsystem* System = UGIEventSubsystem::Get(Sender);
-	if (System)
-	{
-		System->NotifyEvent(EventId, Sender, Outparames);
-	}
+	if (System) System->NotifyEvent(EventId, Sender, Outparames);
 }
 
 DEFINE_FUNCTION(UEventSystemBPLibrary::execNotifyEventByKeyVariadic)
@@ -137,4 +133,3 @@ DEFINE_FUNCTION(UEventSystemBPLibrary::execNotifyEventByKeyVariadic)
 	UEventSystemBPLibrary::NotifyEventByKey(MessageId, Sender, OutParms);
 	P_NATIVE_END
 }
-

@@ -97,13 +97,14 @@ void UEventsSettings::PostEditChangeProperty(FPropertyChangedEvent& PropertyChan
 					FEventSource* Source = Manager.FindOrAddTagSource(*Info.RestrictedConfigName, EEventSourceType::RestrictedTagList);
 					if (!Source)
 					{
-						FNotificationInfo NotificationInfo(FText::Format(NSLOCTEXT("EventsSettings", "UnableToAddRestrictedTagSource", "Unable to add restricted tag source {0}. It may already be in use."), FText::FromString(Info.RestrictedConfigName)));
+						FNotificationInfo NotificationInfo(FText::Format(NSLOCTEXT("EventsSettings", "UnableToAddRestrictedEventSource", "Unable to add restricted event source {0}. It may already be in use."), FText::FromString(Info.RestrictedConfigName)));
 						FSlateNotificationManager::Get().AddNotification(NotificationInfo);
 						Info.RestrictedConfigName.Empty();
 					}
 				}
 			}
 		}
+
 
 		// if we're adding a new restricted config file we will try to auto populate the owner
 		if (PropertyChangedEvent.ChangeType == EPropertyChangeType::ArrayAdd && PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UEventsSettings, RestrictedConfigFiles))

@@ -44,7 +44,7 @@ void FAssetTypeActions_EventAssetBase::GetActions(const TArray<UObject*>& InObje
 		Section.AddMenuEntry(
 			"Events_Edit",
 			LOCTEXT("Events_Edit", "Edit Events..."),
-			LOCTEXT("Events_EditToolTip", "Opens the Gameplay Tag Editor."),
+			LOCTEXT("Events_EditToolTip", "Opens the Events Editor."),
 			FSlateIcon(),
 			FUIAction(FExecuteAction::CreateSP(this, &FAssetTypeActions_EventAssetBase::OpenEventEditor, ContainerObjectOwners, Containers), FCanExecuteAction()));
 	}
@@ -65,12 +65,12 @@ void FAssetTypeActions_EventAssetBase::OpenEventEditor(TArray<UObject*> Objects,
 	if (NumAssets > 1)
 	{
 		AssetName = FText::Format( LOCTEXT("AssetTypeActions_EventAssetBaseMultipleAssets", "{0} Assets"), FText::AsNumber( NumAssets ) );
-		Title = FText::Format( LOCTEXT("AssetTypeActions_EventAssetBaseEditorTitle", "Tag Editor: Owned Events: {0}"), AssetName );
+		Title = FText::Format( LOCTEXT("AssetTypeActions_EventAssetBaseEditorTitle", "Event Editor: Owned Events: {0}"), AssetName );
 	}
 	else if (NumAssets > 0 && EditableContainers[0].TagContainerOwner.IsValid())
 	{
 		AssetName = FText::FromString( EditableContainers[0].TagContainerOwner->GetName() );
-		Title = FText::Format( LOCTEXT("AssetTypeActions_EventAssetBaseEditorTitle", "Tag Editor: Owned Events: {0}"), AssetName );
+		Title = FText::Format( LOCTEXT("AssetTypeActions_EventAssetBaseEditorTitle", "Event Editor: Owned Events: {0}"), AssetName );
 	}
 
 	TSharedPtr<SWindow> Window = SNew(SWindow)

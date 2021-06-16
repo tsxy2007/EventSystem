@@ -281,7 +281,7 @@ void UEventsManager::ConstructEventTree()
 				MutableDefault->EventList.AddUnique(FEventTableRow(FName(*EngineConfigTag)));
 			}
 
-			// Copy from deprecated list in DefaultGamplayTags.ini
+			// Copy from deprecated list in DefaultEvents.ini
 			EngineConfigTags.Empty();
 			GConfig->GetArray(TEXT("/Script/Events.EventsSettings"), TEXT("+Events"), EngineConfigTags, MutableDefault->GetDefaultConfigFilename());
 
@@ -303,7 +303,7 @@ void UEventsManager::ConstructEventTree()
 			}
 
 			// Extra tags
-			AddTagIniSearchPath(FPaths::ProjectConfigDir() / TEXT("Tags"));
+			AddTagIniSearchPath(FPaths::ProjectConfigDir() / TEXT("Events"));
 			AddTagsFromAdditionalLooseIniFiles(ExtraTagIniList);
 		}
 
@@ -315,7 +315,7 @@ void UEventsManager::ConstructEventTree()
 		}
 #endif
 		{
-			SCOPE_LOG_EventS(TEXT("UEventsManager::ConstructEventTree: Request common tags"));
+			SCOPE_LOG_EventS(TEXT("UEventsManager::ConstructEventTree: Request common events"));
 		// Grab the commonly replicated tags
 		CommonlyReplicatedTags.Empty();
 		for (FName TagName : MutableDefault->CommonlyReplicatedTags)
@@ -327,7 +327,7 @@ void UEventsManager::ConstructEventTree()
 			}
 			else
 			{
-				UE_LOG(LogEvents, Warning, TEXT("%s was found in the CommonlyReplicatedTags list but doesn't appear to be a valid tag!"), *TagName.ToString());
+				UE_LOG(LogEvents, Warning, TEXT("%s was found in the CommonlyReplicatedEvents list but doesn't appear to be a valid event!"), *TagName.ToString());
 			}
 		}
 
@@ -394,16 +394,16 @@ void UEventsManager::ConstructEventTree()
 			FName OldTagName = Redirect.OldTagName;
 			FName NewTagName = Redirect.NewTagName;
 
-			if (ensureMsgf(!TagRedirects.Contains(OldTagName), TEXT("Old tag %s is being redirected to more than one tag. Please remove all the redirections except for one."), *OldTagName.ToString()))
+			if (ensureMsgf(!TagRedirects.Contains(OldTagName), TEXT("Old event %s is being redirected to more than one event. Please remove all the redirections except for one."), *OldTagName.ToString()))
 			{
 				FEventInfo OldTag = RequestEvent(OldTagName, false); //< This only succeeds if OldTag is in the Table!
 				if (OldTag.IsValid())
 				{
 					FEventContainer MatchingChildren = RequestEventChildren(OldTag);
 
-					FString Msg = FString::Printf(TEXT("Old tag (%s) which is being redirected still exists in the table!  Generally you should "
-						TEXT("remove the old tags from the table when you are redirecting to new tags, or else users will ")
-						TEXT("still be able to add the old tags to containers.")), *OldTagName.ToString());
+					FString Msg = FString::Printf(TEXT("Old event (%s) which is being redirected still exists in the table!  Generally you should "
+						TEXT("remove the old events from the table when you are redirecting to new events, or else users will ")
+						TEXT("still be able to add the old events to containers.")), *OldTagName.ToString());
 
 					if (MatchingChildren.Num() == 0)
 					{
@@ -411,7 +411,7 @@ void UEventsManager::ConstructEventTree()
 					}
 					else
 					{
-						Msg += TEXT("\nSuppressed warning due to redirected tag being a single component that matched other hierarchy elements.");
+						Msg += TEXT("\nSuppressed warning due to redirected event being a single component that matched other hierarchy elements.");
 						UE_LOG(LogEvents, Log, TEXT("%s"), *Msg);
 					}
 				}
@@ -439,7 +439,7 @@ void UEventsManager::ConstructEventTree()
 
 					if (!bFoundRedirect || IterationsLeft <= 0)
 					{
-						UE_LOG(LogEvents, Warning, TEXT("Invalid new tag %s!  Cannot replace old tag %s."),
+						UE_LOG(LogEvents, Warning, TEXT("Invalid new event %s! Cannot replace old event %s."),
 							*Redirect.NewTagName.ToString(), *Redirect.OldTagName.ToString());
 						break;
 					}
@@ -456,8 +456,8 @@ void UEventsManager::ConstructEventTree()
 	}
 }
 
-int32 PrintNetIndiceAssignment = 0;
-static FAutoConsoleVariableRef CVarPrintNetIndiceAssignment(TEXT("Events.PrintNetIndiceAssignment"), PrintNetIndiceAssignment, TEXT("Logs Event NetIndice assignment"), ECVF_Default );
+int32 ESPrintNetIndiceAssignment = 0;
+static FAutoConsoleVariableRef CVarESPrintNetIndiceAssignment(TEXT("Events.ESPrintNetIndiceAssignment"), ESPrintNetIndiceAssignment, TEXT("Logs Event NetIndice assignment"), ECVF_Default );
 void UEventsManager::ConstructNetIndex()
 {
 	NetworkEventNodeIndex.Empty();
@@ -486,7 +486,7 @@ void UEventsManager::ConstructNetIndex()
 		}
 
 		// A non fatal error should have been thrown when parsing the CommonlyReplicatedTags list. If we make it here, something is seriously wrong.
-		checkf( Found, TEXT("Tag %s not found in NetworkEventNodeIndex"), *Tag.ToString() );
+		checkf( Found, TEXT("Event %s not found in NetworkEventNodeIndex"), *Tag.ToString() );
 	}
 
 	InvalidTagNetIndex = NetworkEventNodeIndex.Num()+1;
@@ -498,12 +498,12 @@ void UEventsManager::ConstructNetIndex()
 	// This is now sorted and it should be the same on both client and server
 	if (NetworkEventNodeIndex.Num() >= INVALID_TAGNETINDEX)
 	{
-		ensureMsgf(false, TEXT("Too many tags in dictionary for networking! Remove tags or increase tag net index size"));
+		ensureMsgf(false, TEXT("Too many events in dictionary for networking! Remove events or increase event net index size"));
 
 		NetworkEventNodeIndex.SetNum(INVALID_TAGNETINDEX - 1);
 	}
 
-	UE_CLOG(PrintNetIndiceAssignment, LogEvents, Display, TEXT("Assigning NetIndices to %d tags."), NetworkEventNodeIndex.Num() );
+	UE_CLOG(ESPrintNetIndiceAssignment, LogEvents, Display, TEXT("Assigning NetIndices to %d events."), NetworkEventNodeIndex.Num() );
 
 	NetworkEventNodeIndexHash = 0;
 
@@ -515,11 +515,11 @@ void UEventsManager::ConstructNetIndex()
 
 			NetworkEventNodeIndexHash = FCrc::StrCrc32(*NetworkEventNodeIndex[i]->GetCompleteTagString().ToLower(), NetworkEventNodeIndexHash);
 
-			UE_CLOG(PrintNetIndiceAssignment, LogEvents, Display, TEXT("Assigning NetIndex (%d) to Tag (%s)"), i, *NetworkEventNodeIndex[i]->GetCompleteTag().ToString());
+			UE_CLOG(ESPrintNetIndiceAssignment, LogEvents, Display, TEXT("Assigning NetIndex (%d) to Event (%s)"), i, *NetworkEventNodeIndex[i]->GetCompleteTag().ToString());
 		}
 		else
 		{
-			UE_LOG(LogEvents, Warning, TEXT("TagNode Indice %d is invalid!"), i);
+			UE_LOG(LogEvents, Warning, TEXT("EventNode Indice %d is invalid!"), i);
 		}
 	}
 
@@ -531,7 +531,7 @@ FName UEventsManager::GetTagNameFromNetIndex(FEventNetIndex Index) const
 	if (Index >= NetworkEventNodeIndex.Num())
 	{
 		// Ensure Index is the invalid index. If its higher than that, then something is wrong.
-		ensureMsgf(Index == InvalidTagNetIndex, TEXT("Received invalid tag net index %d! Tag index is out of sync on client!"), Index);
+		ensureMsgf(Index == InvalidTagNetIndex, TEXT("Received invalid event net index %d! Event index is out of sync on client!"), Index);
 		return NAME_None;
 	}
 	return NetworkEventNodeIndex[Index]->GetCompleteTagName();
@@ -576,7 +576,7 @@ void UEventsManager::GetRestrictedTagConfigFiles(TArray<FString>& RestrictedConf
 	{
 		for (const FEventRestrictedConfigInfo& Config : MutableDefault->RestrictedConfigFiles)
 		{
-			RestrictedConfigFiles.Add(FString::Printf(TEXT("%sTags/%s"), *FPaths::SourceConfigDir(), *Config.RestrictedConfigName));
+			RestrictedConfigFiles.Add(FString::Printf(TEXT("%sEvents/%s"), *FPaths::SourceConfigDir(), *Config.RestrictedConfigName));
 		}
 	}
 }
@@ -1561,7 +1561,7 @@ FEventSource* UEventsManager::FindOrAddTagSource(FName TagSourceName, EEventSour
 	else if (SourceType == EEventSourceType::TagList)
 	{
 		NewSource->SourceTagList = NewObject<UEventsList>(this, TagSourceName, RF_Transient);
-		NewSource->SourceTagList->ConfigFileName = FString::Printf(TEXT("%sTags/%s"), *FPaths::SourceConfigDir(), *TagSourceName.ToString());
+		NewSource->SourceTagList->ConfigFileName = FString::Printf(TEXT("%sEvents/%s"), *FPaths::SourceConfigDir(), *TagSourceName.ToString());
 		if (GUObjectArray.IsDisregardForGC(this))
 		{
 			NewSource->SourceTagList->AddToRoot();
@@ -1570,7 +1570,7 @@ FEventSource* UEventsManager::FindOrAddTagSource(FName TagSourceName, EEventSour
 	else if (SourceType == EEventSourceType::RestrictedTagList)
 	{
 		NewSource->SourceRestrictedTagList = NewObject<URestrictedEventsList>(this, TagSourceName, RF_Transient);
-		NewSource->SourceRestrictedTagList->ConfigFileName = FString::Printf(TEXT("%sTags/%s"), *FPaths::SourceConfigDir(), *TagSourceName.ToString());
+		NewSource->SourceRestrictedTagList->ConfigFileName = FString::Printf(TEXT("%sEvents/%s"), *FPaths::SourceConfigDir(), *TagSourceName.ToString());
 		if (GUObjectArray.IsDisregardForGC(this))
 		{
 			NewSource->SourceRestrictedTagList->AddToRoot();
@@ -1614,7 +1614,7 @@ FEventInfo UEventsManager::RequestEvent(FName TagName, bool ErrorIfNotFound) con
 		static TSet<FName> MissingTagName;
 		if (!MissingTagName.Contains(TagName))
 		{
-			ensureAlwaysMsgf(false, TEXT("Requested Tag %s was not found. Check tag data table."), *TagName.ToString());
+			ensureAlwaysMsgf(false, TEXT("Requested Event %s was not found. Check event data table."), *TagName.ToString());
 			MissingTagName.Add(TagName);
 		}
 	}
@@ -1629,39 +1629,39 @@ bool UEventsManager::IsValidEventString(const FString& TagString, FText* OutErro
 
 	if (FixedString.IsEmpty())
 	{
-		ErrorText = LOCTEXT("EmptyStringError", "Tag is empty");
+		ErrorText = LOCTEXT("EmptyStringError", "Event is empty");
 		bIsValid = false;
 	}
 
 	while (FixedString.StartsWith(TEXT("."), ESearchCase::CaseSensitive))
 	{
-		ErrorText = LOCTEXT("StartWithPeriod", "Tag starts with .");
+		ErrorText = LOCTEXT("StartWithPeriod", "Event starts with .");
 		FixedString.RemoveAt(0);
 		bIsValid = false;
 	}
 
 	while (FixedString.EndsWith(TEXT("."), ESearchCase::CaseSensitive))
 	{
-		ErrorText = LOCTEXT("EndWithPeriod", "Tag ends with .");
+		ErrorText = LOCTEXT("EndWithPeriod", "Event ends with .");
 		FixedString.RemoveAt(FixedString.Len() - 1);
 		bIsValid = false;
 	}
 
 	while (FixedString.StartsWith(TEXT(" "), ESearchCase::CaseSensitive))
 	{
-		ErrorText = LOCTEXT("StartWithSpace", "Tag starts with space");
+		ErrorText = LOCTEXT("StartWithSpace", "Event starts with space");
 		FixedString.RemoveAt(0);
 		bIsValid = false;
 	}
 
 	while (FixedString.EndsWith(TEXT(" "), ESearchCase::CaseSensitive))
 	{
-		ErrorText = LOCTEXT("EndWithSpace", "Tag ends with space");
+		ErrorText = LOCTEXT("EndWithSpace", "Event ends with space");
 		FixedString.RemoveAt(FixedString.Len() - 1);
 		bIsValid = false;
 	}
 
-	FText TagContext = LOCTEXT("EventContext", "Tag");
+	FText TagContext = LOCTEXT("EventContext", "Event");
 	if (!FName::IsValidXName(TagString, InvalidTagCharacters, &ErrorText, &TagContext))
 	{
 		for (TCHAR& TestChar : FixedString)

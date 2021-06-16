@@ -39,7 +39,7 @@ DEFINE_STAT(STAT_UEventsManager_EventsMatch);
  *	-NetIndexFirstBitSegment is the number of bits (not including the "more" bit) for the first segment.
  *
  */
-void SerializeTagNetIndexPacked(FArchive& Ar, FEventNetIndex& Value, const int32 NetIndexFirstBitSegment, const int32 MaxBits)
+void ESSerializeTagNetIndexPacked(FArchive& Ar, FEventNetIndex& Value, const int32 NetIndexFirstBitSegment, const int32 MaxBits)
 {
 	// Case where we have no segment or the segment is larger than max bits
 	if (NetIndexFirstBitSegment <= 0 || NetIndexFirstBitSegment >= MaxBits)
@@ -1037,10 +1037,10 @@ FText FEventContainer::ToMatchingText(EEventContainerMatchType MatchType, bool b
 #define LOCTEXT_NAMESPACE "FEventContainer"
 	const FText MatchingDescription[] =
 	{
-		LOCTEXT("MatchesAnyEvents", "Has any tags in set: {EventSet}"),
-		LOCTEXT("NotMatchesAnyEvents", "Does not have any tags in set: {EventSet}"),
-		LOCTEXT("MatchesAllEvents", "Has all tags in set: {EventSet}"),
-		LOCTEXT("NotMatchesAllEvents", "Does not have all tags in set: {EventSet}")
+		LOCTEXT("MatchesAnyEvents", "Has any events in set: {EventSet}"),
+		LOCTEXT("NotMatchesAnyEvents", "Does not have any events in set: {EventSet}"),
+		LOCTEXT("MatchesAllEvents", "Has all events in set: {EventSet}"),
+		LOCTEXT("NotMatchesAllEvents", "Does not have all events in set: {EventSet}")
 	};
 #undef LOCTEXT_NAMESPACE
 
@@ -1289,11 +1289,11 @@ bool FEventInfo::NetSerialize_Packed(FArchive& Ar, class UPackageMap* Map, bool&
 		{
 			NetIndex = TagManager.GetNetIndexFromTag(*this);
 			
-			SerializeTagNetIndexPacked(Ar, NetIndex, TagManager.NetIndexFirstBitSegment, TagManager.NetIndexTrueBitNum);
+			ESSerializeTagNetIndexPacked(Ar, NetIndex, TagManager.NetIndexFirstBitSegment, TagManager.NetIndexTrueBitNum);
 		}
 		else
 		{
-			SerializeTagNetIndexPacked(Ar, NetIndex, TagManager.NetIndexFirstBitSegment, TagManager.NetIndexTrueBitNum);
+			ESSerializeTagNetIndexPacked(Ar, NetIndex, TagManager.NetIndexFirstBitSegment, TagManager.NetIndexTrueBitNum);
 			TagName = TagManager.GetTagNameFromNetIndex(NetIndex);
 		}
 	}
@@ -1959,12 +1959,12 @@ static void TagPackingTest()
 				FEventNetIndex NI = NetIndex;
 
 				FNetBitWriter	BitWriter(nullptr, 1024 * 8);
-				SerializeTagNetIndexPacked(BitWriter, NI, NetIndexBitsPerComponent, TotalNetIndexBits);
+				ESSerializeTagNetIndexPacked(BitWriter, NI, NetIndexBitsPerComponent, TotalNetIndexBits);
 
 				FNetBitReader	Reader(nullptr, BitWriter.GetData(), BitWriter.GetNumBits());
 
 				FEventNetIndex NewIndex;
-				SerializeTagNetIndexPacked(Reader, NewIndex, NetIndexBitsPerComponent, TotalNetIndexBits);
+				ESSerializeTagNetIndexPacked(Reader, NewIndex, NetIndexBitsPerComponent, TotalNetIndexBits);
 
 				if (ensureAlways((NewIndex == NI)) == false)
 				{
@@ -1979,7 +1979,7 @@ static void TagPackingTest()
 
 }
 
-FAutoConsoleCommand TagPackingTestCmd(
+FAutoConsoleCommand ESTagPackingTestCmd(
 	TEXT("Events.PackingTest"), 
 	TEXT( "Prints frequency of gameplay tags" ), 
 	FConsoleCommandDelegate::CreateStatic(TagPackingTest)
