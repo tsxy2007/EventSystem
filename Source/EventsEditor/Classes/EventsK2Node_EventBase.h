@@ -70,5 +70,6 @@ protected:
 	UEdGraphPin* GetThenPin() const;
 	static FName GetEventPinName();
 	FName GetUniquePinName();
-public:
+protected:
+	TArray<UEdGraphPin*> DefaultPins;
 };

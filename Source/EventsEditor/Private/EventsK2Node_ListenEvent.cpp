@@ -37,7 +37,7 @@ void UEventsK2Node_ListenEvent::AddInnerPin(FName PinName, const FEdGraphPinType
 
 void UEventsK2Node_ListenEvent::CreateOutEventPin()
 {
-	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, OutEventPinName);
+	DefaultPins.Add(CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, OutEventPinName));
 }
 
 void UEventsK2Node_ListenEvent::CreateReturnEventHandlePin()
@@ -48,7 +48,7 @@ void UEventsK2Node_ListenEvent::CreateReturnEventHandlePin()
 	PinType.PinCategory = UEdGraphSchema_K2::PC_Struct;
 	PinType.PinSubCategoryObject = FEventHandle::StaticStruct();
 
-	CreatePin(EGPD_Output, PinType, OutReturnEventHandleName);
+	DefaultPins.Add(CreatePin(EGPD_Output, PinType, OutReturnEventHandleName));
 }
 
 UEdGraphPin* UEventsK2Node_ListenEvent::GetOutMessagePin() const

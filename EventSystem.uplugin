@@ -1,8 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 2,
-	"VersionName": "1.1",
-	"EngineVersion": "4.26",
+	"VersionName": "1.3",
 	"FriendlyName": "EventSystem",
 	"Description": "",
 	"Category": "Other",
@@ -11,8 +10,8 @@
 	"DocsURL": "https://www.youtube.com/watch?v=IpKZDVSJw08",
 	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/c8ad6bb586e64428986becc5a1ed3cbf",
 	"SupportURL": "",
+	"EngineVersion": "4.26.2",
 	"CanContainContent": true,
-	"IsBetaVersion": false,
 	"IsExperimentalVersion": true,
 	"Installed": true,
 	"Modules": [

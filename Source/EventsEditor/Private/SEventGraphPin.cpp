@@ -142,9 +142,9 @@ void SEventGraphPin::RefreshTagList()
 	{
 		CurrentDefaultValue = FString(TEXT(""));
 	}
-	if (!CurrentDefaultValue.Equals(TagString))
+	if (!CurrentDefaultValue.Equals(TagName))
 	{
-		GraphPinObj->GetSchema()->TrySetDefaultValue(*GraphPinObj, TagString);
+		GraphPinObj->GetSchema()->TrySetDefaultValue(*GraphPinObj, TagName);
 	}
 }
 

@@ -24,7 +24,7 @@ void UGIEventSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-void UGIEventSubsystem::NotifyEvent(const FString& EventId, UObject* Sender, const TArray<FPyOutputParam, TInlineAllocator<8>>& Outparames)
+void UGIEventSubsystem::NotifyEvent(const FString& EventId, UObject* Sender, const TArray<FOutputParam, TInlineAllocator<8>>& Outparames)
 {
 	if (!ListenerMap.Contains(EventId)) return;
 

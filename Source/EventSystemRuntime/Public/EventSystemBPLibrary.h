@@ -12,7 +12,7 @@ class EVENTSYSTEMRUNTIME_API UEventSystemBPLibrary : public UBlueprintFunctionLi
 	GENERATED_UCLASS_BODY()
 
 public:
-	static void NotifyEventByKey(const FString& EventId, UObject* Sender, const TArray<FPyOutputParam, TInlineAllocator<8>>& Outparames);
+	static void NotifyEventByKey(const FString& EventId, UObject* Sender, const TArray<FOutputParam, TInlineAllocator<8>>& Outparames);
 public:
 	UFUNCTION(BlueprintCallable, CustomThunk, meta = (CallableWithoutWorldContext, BlueprintInternalUseOnly = true, HidePin = "Sender", DefaultToSelf = "Sender", AutoCreateRefTerm = "MessageId", Variadic), Category = "EventSystem")
 	static void NotifyEventByKeyVariadic(const FString& MessageId, UObject* Sender); 

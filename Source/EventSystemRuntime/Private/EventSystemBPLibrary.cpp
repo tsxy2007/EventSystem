@@ -104,7 +104,7 @@ FName UEventSystemBPLibrary::LocalName(const FName& Value)
 	return Value;
 }
 
-void UEventSystemBPLibrary::NotifyEventByKey(const FString& EventId, UObject* Sender, const TArray<FPyOutputParam, TInlineAllocator<8>>& Outparames)
+void UEventSystemBPLibrary::NotifyEventByKey(const FString& EventId, UObject* Sender, const TArray<FOutputParam, TInlineAllocator<8>>& Outparames)
 {
 	UGIEventSubsystem* System = UGIEventSubsystem::Get(Sender);
 	if (System) System->NotifyEvent(EventId, Sender, Outparames);
@@ -116,13 +116,13 @@ DEFINE_FUNCTION(UEventSystemBPLibrary::execNotifyEventByKeyVariadic)
 	P_GET_OBJECT(UObject, Sender);
 
 	// Read the output values and store them to write to later from the Python context
-	TArray<FPyOutputParam, TInlineAllocator<8>> OutParms;
+	TArray<FOutputParam, TInlineAllocator<8>> OutParms;
 	while (Stack.PeekCode() != EX_EndFunctionParms)
 	{
 		Stack.StepCompiledIn<FProperty>(nullptr);
 		check(Stack.MostRecentProperty&& Stack.MostRecentPropertyAddress);
 
-		FPyOutputParam& OutParam = OutParms.AddDefaulted_GetRef();
+		FOutputParam& OutParam = OutParms.AddDefaulted_GetRef();
 		OutParam.Property = Stack.MostRecentProperty;
 		OutParam.PropAddr = Stack.MostRecentPropertyAddress;
 

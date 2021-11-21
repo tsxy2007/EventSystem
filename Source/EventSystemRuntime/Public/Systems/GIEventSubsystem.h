@@ -6,7 +6,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "GIEventSubsystem.generated.h"
 
-struct FPyOutputParam
+struct FOutputParam
 {
 	FProperty* Property = nullptr;
 	uint8* PropAddr = nullptr;
@@ -66,13 +66,22 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
-	void NotifyEvent(const FString& EventId, UObject* Sender, const TArray<FPyOutputParam, TInlineAllocator<8>>& Outparames);
+	void NotifyEvent(const FString& EventId, UObject* Sender, const TArray<FOutputParam, TInlineAllocator<8>>& Outparames);
 	const FEventHandle ListenEvent(const FString& MessageId, UObject* Listener, FName EventName);
 	void UnListenEvent(const FEventHandle& InHandle);
 	void UnListenEvents(UObject* Listener); // FIX (blowpunch)
 
 	static UGIEventSubsystem* Get(const UObject* WorldContext);
 
+	template<typename... TArgs>
+	void NotifyEvent(TArgs&&... Args);
+
 private:
 	TMap<FString, TSet<FEventHandle>> ListenerMap;
 };
+
+template<typename... TArgs>
+void UGIEventSubsystem::NotifyEvent(TArgs&&... Args)
+{
+
+}
