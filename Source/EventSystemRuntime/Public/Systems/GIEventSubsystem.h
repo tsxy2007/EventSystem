@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "Templates/Tuple.h"
+#include <tuple>
 #include "GIEventSubsystem.generated.h"
 
 struct FOutputParam
@@ -67,7 +68,7 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
-	void NotifyEvent(const FString& EventId, UObject* Sender, const TArray<FOutputParam, TInlineAllocator<8>>& Outparames);
+	void NotifyEventWithParams(const FString& EventId, UObject* Sender, const TArray<FOutputParam, TInlineAllocator<8>>& Outparames);
 	const FEventHandle ListenEvent(const FString& MessageId, UObject* Listener, FName EventName);
 	void UnListenEvent(const FEventHandle& InHandle);
 	void UnListenEvents(UObject* Listener); // FIX (blowpunch)
@@ -81,57 +82,33 @@ private:
 	TMap<FString, TSet<FEventHandle>> ListenerMap;
 };
 
+template<typename T>
+FOutputParam MakeOutputParam(T& t)
+{
+	FOutputParam OutputParam;
+	OutputParam.PropAddr = (uint8*)std::addressof(t);
+	return OutputParam;
+}
+
+template<typename T,size_t... Is>
+TArray<FOutputParam, TInlineAllocator<8>> MakeOutputParamFromTuple(T& Tuple, const std::index_sequence<Is...>&)
+{
+	return TArray<FOutputParam, TInlineAllocator<8>>{MakeOutputParam(std::get<Is>(Tuple))...};
+}
+
+template<typename T>
+TArray<FOutputParam, TInlineAllocator<8>> MakeParam(T& tup)
+{
+	return MakeOutputParamFromTuple(tup, std::make_index_sequence<std::tuple_size<T>::value>());
+}
+
+
 template<typename... TArgs>
 void UGIEventSubsystem::NotifyEvent(const FString& EventId,TArgs&&... Args)
 {
-	TTuple<TArgs...> InParams(Forward<TArgs>(Args)...);
-	//拿到字节码首地址 我们通过一个个字节码进行访问
-	uint8* Code = (uint8*)&InParams;
+	std::tuple<TArgs...> InParams(std::forward<TArgs>(Args)...);
 
+	TArray<FOutputParam, TInlineAllocator<8>> OutputParam = MakeParam(InParams);
 
-	if (!ListenerMap.Contains(EventId)) return;
-
-	TArray<FEventHandle> ListenersToRemove;
-
-	{
-		TSet<FEventHandle> Listeners = ListenerMap.FindChecked(EventId);
-		for (const auto& Listen : Listeners)
-		{
-			if (!Listen.Listener.Get())
-			{
-				ListenersToRemove.Add(Listen);
-				continue;
-			}
-
-			// FIX (blowpunch)
-			if (Listen.Listener.Get()->IsPendingKillOrUnreachable())
-			{
-				//UE_LOG(EventSystem, Warning, TEXT("Listener %s is pending kill or unreachable!"), *Listen.Listener.Get()->GetFName().ToString());
-				continue;
-			}
-			///
-
-			UFunction* Function = Listen.Listener.Get()->FindFunction(Listen.EventName);
-			//Listen.Listener.Get()->ProcessEvent(Function, Args);
-
-			/*if (Function)
-			{
-				auto Params = FMemory_Alloca(Function->ParmsSize);
-				FMemory::Memzero(Params, Function->ParmsSize);
-				int32 Index = 0;
-				for (TFieldIterator<FProperty> It(Function); It && It->HasAnyPropertyFlags(CPF_Parm); ++It)
-				{
-					if (It->HasAnyPropertyFlags(CPF_ReturnParm))
-					{
-						break;
-					}
-					FProperty* Prop = *It;
-
-					Prop->CopyCompleteValue(Prop->ContainerPtrToValuePtr<void>(Params), Code);
-					Code += Prop->GetSize();
-				}
-				Listen.Listener.Get()->ProcessEvent(Function, Params);
-			}*/
-		}
-	}
+	this->NotifyEventWithParams(EventId, nullptr, OutputParam);
 }

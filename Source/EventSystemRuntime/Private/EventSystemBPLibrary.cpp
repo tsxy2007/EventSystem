@@ -35,7 +35,8 @@ void UEventSystemBPLibrary::UnListenEvent(const UObject* WorldContext, const FEv
 void UEventSystemBPLibrary::UnListenEvents(UObject* Listener)
 {
 	UGIEventSubsystem* System = UGIEventSubsystem::Get(Listener);
-	if (System) System->UnListenEvents(Listener);
+	if (System) 
+		System->UnListenEvents(Listener);
 }
 ///
 
@@ -107,7 +108,8 @@ FName UEventSystemBPLibrary::LocalName(const FName& Value)
 void UEventSystemBPLibrary::NotifyEventByKey(const FString& EventId, UObject* Sender, const TArray<FOutputParam, TInlineAllocator<8>>& Outparames)
 {
 	UGIEventSubsystem* System = UGIEventSubsystem::Get(Sender);
-	if (System) System->NotifyEvent(EventId, Sender, Outparames);
+	if (System)
+		System->NotifyEventWithParams(EventId, Sender, Outparames);
 }
 
 DEFINE_FUNCTION(UEventSystemBPLibrary::execNotifyEventByKeyVariadic)
