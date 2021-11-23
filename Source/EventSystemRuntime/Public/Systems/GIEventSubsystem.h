@@ -76,7 +76,7 @@ public:
 	static UGIEventSubsystem* Get(const UObject* WorldContext);
 
 	template<typename... TArgs>
-	void NotifyEvent(const FString& EventId,TArgs&&... Args);
+	void NotifyEvent(const FString& EventId, UObject* Sender, TArgs&&... Args);
 
 private:
 	TMap<FString, TSet<FEventHandle>> ListenerMap;
@@ -104,11 +104,11 @@ TArray<FOutputParam, TInlineAllocator<8>> MakeParam(T& tup)
 
 
 template<typename... TArgs>
-void UGIEventSubsystem::NotifyEvent(const FString& EventId,TArgs&&... Args)
+void UGIEventSubsystem::NotifyEvent(const FString& EventId, UObject* Sender, TArgs&&... Args)
 {
 	std::tuple<TArgs...> InParams(std::forward<TArgs>(Args)...);
 
 	TArray<FOutputParam, TInlineAllocator<8>> OutputParam = MakeParam(InParams);
 
-	this->NotifyEventWithParams(EventId, nullptr, OutputParam);
+	this->NotifyEventWithParams(EventId, Sender, OutputParam);
 }
