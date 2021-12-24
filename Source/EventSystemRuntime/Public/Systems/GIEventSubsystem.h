@@ -106,9 +106,12 @@ TArray<FOutputParam, TInlineAllocator<8>> MakeParam(T& tup)
 template<typename... TArgs>
 void UGIEventSubsystem::NotifyEvent(const FString& EventId, UObject* Sender, TArgs&&... Args)
 {
-	std::tuple<TArgs...> InParams(std::forward<TArgs>(Args)...);
+	//暂时注释看看下边支持情况不行在改回来
+	//std::tuple<TArgs...> InParams(std::forward<TArgs>(Args)...);
+	//TArray<FOutputParam, TInlineAllocator<8>> OutputParam = MakeParam(InParams);
 
-	TArray<FOutputParam, TInlineAllocator<8>> OutputParam = MakeParam(InParams);
+	// c++14 支持
+	TArray<FOutputParam, TInlineAllocator<8>> VOutputParam = { MakeOutputParam(Args)... };
 
-	this->NotifyEventWithParams(EventId, Sender, OutputParam);
+	this->NotifyEventWithParams(EventId, Sender, VOutputParam);
 }
